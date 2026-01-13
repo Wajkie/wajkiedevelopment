@@ -1,37 +1,38 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'secondary' | 'ghost' | 'destructive' | 'outline';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   children: ReactNode;
 }
 
 export default function Button({ 
-  variant = 'secondary', 
+  variant = 'default', 
   size = 'md', 
   className = '',
-  disabled = false,
   children,
   ...props 
 }: ButtonProps) {
-  const baseStyles = 'rounded transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
   
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white disabled:hover:bg-blue-600',
-    secondary: 'bg-gray-700 hover:bg-gray-600 text-gray-200 border border-gray-600 disabled:hover:bg-gray-700',
-    ghost: 'bg-transparent hover:bg-gray-700 text-gray-300 disabled:hover:bg-transparent',
+    default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+    ghost: 'hover:bg-accent hover:text-accent-foreground',
+    destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    outline: 'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
   };
 
   const sizes = {
-    sm: 'px-2 py-1 text-sm',
-    md: 'px-3 py-1.5 text-base',
-    lg: 'px-4 py-2 text-lg',
+    sm: 'h-9 px-3 text-sm',
+    md: 'h-10 px-4 py-2',
+    lg: 'h-11 px-8 text-base',
+    icon: 'h-10 w-10',
   };
 
   return (
     <button
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      disabled={disabled}
       {...props}
     >
       {children}
