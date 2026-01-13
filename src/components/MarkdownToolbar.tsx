@@ -129,7 +129,7 @@ export default function MarkdownToolbar({ onInsert, textareaRef }: MarkdownToolb
           variant="secondary"
           size="sm"
           className="min-w-[2.5rem] flex items-center justify-center"
-          title={config.label}
+          aria-label={config.label}
         >
           {config.icon}
         </Button>

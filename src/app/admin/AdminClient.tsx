@@ -2,6 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Textarea } from '@/components/ui/Textarea';
 import MarkdownToolbar from '@/components/MarkdownToolbar';
 import MarkdownGuide from '@/components/MarkdownGuide';
 import Button from '@/components/ui/Button';
@@ -75,150 +79,177 @@ export default function AdminClient() {
   };
 
   return (
-    <div className="min-h-screen dark bg-background py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-card rounded-lg border shadow-sm p-6">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold tracking-tight">Nytt blogginlägg</h1>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                onClick={() => setShowGuide(true)}
-                variant="outline"
-                size="sm"
-              >
-                📖 Guide
-              </Button>
-              <Button
-                type="button"
-                onClick={handleLogout}
-                variant="ghost"
-                size="sm"
-              >
-                Logga ut
-              </Button>
+    <main className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header Card */}
+        <Card as="section" aria-labelledby="page-title">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle as="h1" id="page-title" className="text-3xl">
+                  Nytt blogginlägg
+                </CardTitle>
+                <CardDescription>
+                  Skriv markdown, förhandsgranska och publicera direkt till GitHub
+                </CardDescription>
+              </div>
+              <nav aria-label="Huvudnavigering">
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => setShowGuide(true)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    📖 Guide
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleLogout}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Logga ut
+                  </Button>
+                </div>
+              </nav>
             </div>
-          </div>
+          </CardHeader>
+        </Card>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Titel
-              </label>
-              <input
-                id="title"
-                type="text"
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Min fantastiska bloggpost"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="slug" className="text-sm font-medium leading-none">
-                Slug (URL)
-              </label>
-              <input
-                id="slug"
-                type="text"
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="min-fantastiska-bloggpost"
-                required
-              />
-              <p className="text-sm text-muted-foreground">
-                /blog/{formData.slug || 'slug-genereras-automatiskt'}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="date" className="text-sm font-medium leading-none">
-                Datum
-              </label>
-              <input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="excerpt" className="text-sm font-medium leading-none">
-                Excerpt
-              </label>
-              <textarea
-                id="excerpt"
-                value={formData.excerpt}
-                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                placeholder="En kort sammanfattning av inlägget..."
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="content" className="text-sm font-medium leading-none">
-                Innehåll (Markdown)
-              </label>
-              <div className="border border-input rounded-md overflow-hidden">
-                <MarkdownToolbar 
-                  onInsert={(newContent) => setFormData({ ...formData, content: newContent })}
-                  textareaRef={contentTextareaRef}
+        {/* Main Form Card */}
+        <Card as="section" aria-labelledby="form-title">
+          <form onSubmit={handleSubmit}>
+            <CardContent className="pt-6 space-y-6">
+              <h2 id="form-title" className="sr-only">
+                Formulär för nytt blogginlägg
+              </h2>
+              {/* Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title">Titel</Label>
+                <Input
+                  id="title"
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder="Min fantastiska bloggpost"
+                  required
+                  autoFocus
+                  aria-describedby="title-help"
                 />
-                <textarea
-                  id="content"
-                  ref={contentTextareaRef}
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="w-full px-3 py-2 bg-background text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none border-0"
-                  rows={20}
-                  placeholder="# Min rubrik&#10;&#10;Här skriver du ditt innehåll med **markdown**!&#10;&#10;## Underrubrik&#10;&#10;- Lista&#10;- Med punkter"
+                <p id="title-help" className="text-sm text-muted-foreground">
+                  Slug genereras automatiskt från titeln
+                </p>
+              </div>
+
+              {/* Slug */}
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug (URL)</Label>
+                <Input
+                  id="slug"
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="min-fantastiska-bloggpost"
+                  required
+                  aria-describedby="slug-preview"
+                />
+                <p id="slug-preview" className="text-sm text-muted-foreground font-mono">
+                  /blog/{formData.slug || 'slug-genereras-automatiskt'}
+                </p>
+              </div>
+
+              {/* Date */}
+              <div className="space-y-2">
+                <Label htmlFor="date">Publiceringsdatum</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   required
                 />
               </div>
-              <p className="text-sm text-muted-foreground">
-                Använd toolbar eller skriv markdown direkt
-              </p>
-            </div>
 
-            {message && (
-              <div 
-                role="alert"
-                aria-live="polite"
-                className={`rounded-lg border p-4 ${message.includes('✅') ? 'bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400' : 'bg-destructive/10 text-destructive border-destructive/20'}`}
-              >
-                {message}
+              {/* Excerpt */}
+              <div className="space-y-2">
+                <Label htmlFor="excerpt">Excerpt (valfritt)</Label>
+                <Textarea
+                  id="excerpt"
+                  value={formData.excerpt}
+                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                  placeholder="En kort sammanfattning av inlägget..."
+                  rows={3}
+                  aria-describedby="excerpt-help"
+                />
+                <p id="excerpt-help" className="text-sm text-muted-foreground">
+                  Visas i blogglistningen
+                </p>
               </div>
-            )}
 
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="submit"
-                disabled={saving}
-                variant="default"
-                size="md"
-              >
-                {saving ? 'Sparar...' : 'Publicera'}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => router.push('/blog')}
-                variant="outline"
-                size="md"
-              >
-                Avbryt
-              </Button>
-            </div>
+              {/* Content with Markdown Toolbar */}
+              <div className="space-y-2">
+                <Label htmlFor="content">Innehåll (Markdown)</Label>
+                <div className="rounded-lg overflow-hidden border border-input">
+                  <MarkdownToolbar 
+                    onInsert={(newContent) => setFormData({ ...formData, content: newContent })}
+                    textareaRef={contentTextareaRef}
+                  />
+                  <Textarea
+                    id="content"
+                    ref={contentTextareaRef}
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    className="font-mono border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[400px]"
+                    placeholder="# Min rubrik&#10;&#10;Här skriver du ditt innehåll med **markdown**!&#10;&#10;## Underrubrik&#10;&#10;- Lista&#10;- Med punkter"
+                    required
+                    aria-describedby="content-help"
+                  />
+                </div>
+                <p id="content-help" className="text-sm text-muted-foreground">
+                  Använd toolbar eller skriv markdown direkt
+                </p>
+              </div>
+
+              {/* Message */}
+              {message && (
+                <div 
+                  role="alert"
+                  aria-live="polite"
+                  className={`rounded-lg border p-4 ${
+                    message.includes('✅') 
+                      ? 'bg-accent/10 text-accent border-accent/20' 
+                      : 'bg-destructive/10 text-destructive border-destructive/20'
+                  }`}
+                >
+                  {message}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  aria-busy={saving}
+                >
+                  {saving ? 'Publicerar...' : 'Publicera blogginlägg'}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => router.push('/blog')}
+                  variant="outline"
+                >
+                  Avbryt
+                </Button>
+              </div>
+            </CardContent>
           </form>
-        </div>
+        </Card>
 
+        {/* Markdown Guide Modal */}
         <MarkdownGuide isOpen={showGuide} onClose={() => setShowGuide(false)} />
       </div>
-    </div>
+    </main>
   );
 }

@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import Button from '@/components/ui/Button';
 
 export default function LoginPage() {
@@ -43,58 +46,79 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full border border-gray-700">
-        <h1 className="text-3xl font-bold text-white mb-2">🔐 Admin Login</h1>
-        <p className="text-gray-400 mb-6">
-          Ange 6-siffrig kod från Google Authenticator
-        </p>
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-3xl font-bold flex items-center gap-2">
+              <span aria-hidden="true">🔐</span>
+              Admin Login
+            </CardTitle>
+            <CardDescription>
+              Ange 6-siffrig kod från din authenticator app
+            </CardDescription>
+          </CardHeader>
+          
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="totp-code" className="sr-only">
+                  TOTP Kod
+                </Label>
+                <Input
+                  id="totp-code"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                  className="text-center text-2xl font-mono tracking-widest"
+                  placeholder="000000"
+                  autoFocus
+                  autoComplete="one-time-code"
+                  aria-label="Sexsiffrig TOTP-kod"
+                  aria-invalid={error ? 'true' : 'false'}
+                  aria-describedby={error ? 'code-error' : undefined}
+                  required
+                />
+              </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">
-              TOTP Code
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-center text-2xl font-mono tracking-widest focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="000000"
-              autoFocus
-              required
-            />
-          </div>
+              {error && (
+                <div 
+                  id="code-error"
+                  role="alert"
+                  className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm"
+                >
+                  {error}
+                </div>
+              )}
+            </CardContent>
 
-          {error && (
-            <div className="p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
-              {error}
-            </div>
-          )}
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                disabled={loading || code.length !== 6}
+                className="w-full"
+                aria-busy={loading}
+              >
+                {loading ? 'Verifierar...' : 'Logga in'}
+              </Button>
 
-          <Button
-            type="submit"
-            disabled={loading || code.length !== 6}
-            className="w-full"
-          >
-            {loading ? 'Verifierar...' : 'Logga in'}
-          </Button>
-        </form>
-
-        <div className="mt-6 pt-6 border-t border-gray-700">
-          <p className="text-sm text-gray-400 text-center">
-            Behöver du sätta upp authenticator?
-          </p>
-          <a
-            href="/auth/setup"
-            className="text-sm text-blue-400 hover:text-blue-300 block text-center mt-2"
-          >
-            → Gå till setup
-          </a>
-        </div>
+              <div className="w-full pt-4 border-t border-border space-y-2 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Behöver du sätta upp authenticator?
+                </p>
+                <a
+                  href="/auth/setup"
+                  className="text-sm text-accent hover:text-accent/80 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                >
+                  Gå till setup →
+                </a>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
       </div>
     </div>
   );
