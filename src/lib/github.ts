@@ -5,6 +5,7 @@ import type { Post, PostMetadata, GitHubFile, GitHubContent, PostFrontmatter, Gi
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER; // t.ex. "wajkie"
 const GITHUB_REPO = process.env.GITHUB_REPO;   // t.ex. "blogposts"
+const NPM_USERNAME = process.env.NPM_USERNAME || GITHUB_OWNER; // Använd samma username som GitHub om inte annat anges
 const CONTENT_PATH = 'content/posts';           // Sökväg i repot
 
 const octokit = new Octokit({
@@ -197,16 +198,16 @@ export async function getUserRepos(): Promise<GitHubRepo[]> {
           full_name: repoData.full_name,
           description: repoData.description,
           html_url: repoData.html_url,
-          homepage: repoData.homepage,
-          language: repoData.language,
-          stargazers_count: repoData.stargazers_count,
-          forks_count: repoData.forks_count,
+          homepage: repoData.homepage ?? null,
+          language: repoData.language ?? null,
+          stargazers_count: repoData.stargazers_count ?? 0,
+          forks_count: repoData.forks_count ?? 0,
           topics: repoData.topics || [],
-          created_at: repoData.created_at,
-          updated_at: repoData.updated_at,
-          pushed_at: repoData.pushed_at,
-          fork: repoData.fork,
-          archived: repoData.archived,
+          created_at: repoData.created_at ?? new Date().toISOString(),
+          updated_at: repoData.updated_at ?? new Date().toISOString(),
+          pushed_at: repoData.pushed_at ?? new Date().toISOString(),
+          fork: repoData.fork ?? false,
+          archived: repoData.archived ?? false,
           has_workflows: hasWorkflows,
         };
         return repo;
@@ -220,3 +221,79 @@ export async function getUserRepos(): Promise<GitHubRepo[]> {
   }
 }
 
+// Hämta senaste workflow runs för ett repo
+export async function getWorkflowRuns(repoName: string) {
+  if (!GITHUB_OWNER || !GITHUB_TOKEN) {
+    return [];
+  }
+
+  try {
+    const { data } = await octokit.rest.actions.listWorkflowRunsForRepo({
+      owner: GITHUB_OWNER,
+      repo: repoName,
+      per_page: 5,
+    });
+
+    return data.workflow_runs.map(run => ({
+      id: run.id,
+      name: run.name ?? 'Workflow',
+      status: run.status as 'queued' | 'in_progress' | 'completed',
+      conclusion: run.conclusion as 'success' | 'failure' | 'cancelled' | 'skipped' | null,
+      created_at: run.created_at,
+      updated_at: run.updated_at,
+      html_url: run.html_url,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// Hämta senaste commit för ett repo
+export async function getLatestCommit(repoName: string) {
+  if (!GITHUB_OWNER || !GITHUB_TOKEN) {
+    return null;
+  }
+
+  try {
+    const { data } = await octokit.rest.repos.listCommits({
+      owner: GITHUB_OWNER,
+      repo: repoName,
+      per_page: 1,
+    });
+
+    if (data.length === 0) return null;
+
+    const commit = data[0];
+    return {
+      sha: commit.sha,
+      message: commit.commit.message,
+      author: commit.commit.author?.name ?? 'Unknown',
+      date: commit.commit.author?.date ?? new Date().toISOString(),
+      url: commit.html_url,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Hämta antal publicerade npm-paket för användaren
+export async function getNpmPackageCount(): Promise<number> {
+  if (!NPM_USERNAME) {
+    return 0;
+  }
+
+  try {
+    const response = await fetch(
+      `https://registry.npmjs.org/-/v1/search?text=author:${NPM_USERNAME}&size=250`
+    );
+
+    if (!response.ok) {
+      return 0;
+    }
+
+    const data = await response.json();
+    return data.total ?? 0;
+  } catch {
+    return 0;
+  }
+}
