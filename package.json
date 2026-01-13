@@ -13,6 +13,7 @@
   "dependencies": {
     "@types/pg": "^8.16.0",
     "gray-matter": "^4.0.3",
+    "highlight.js": "^11.11.1",
     "kysely": "^0.28.9",
     "kysely-ctl": "^0.20.0",
     "next": "16.1.1",
@@ -22,6 +23,9 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.0",
     "react-markdown": "^10.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {

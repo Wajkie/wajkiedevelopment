@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { Kysely, Migrator, FileMigrationProvider } from 'kysely';
+import { Migrator, FileMigrationProvider } from 'kysely';
 import * as path from 'path';
 import { db } from './db';
 

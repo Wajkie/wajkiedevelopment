@@ -15,10 +15,10 @@ export default async function BlogPage() {
     .execute();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-gray-900 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Min blogg</h1>
+          <h1 className="text-4xl font-bold text-white">Min blogg</h1>
           <Link 
             href="/admin"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -28,11 +28,11 @@ export default async function BlogPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600 mb-4">Inga blogginlägg än.</p>
+          <div className="bg-gray-800 rounded-lg shadow-xl p-8 text-center border border-gray-700">
+            <p className="text-gray-300 mb-4">Inga blogginlägg än.</p>
             <Link 
               href="/admin"
-              className="text-blue-600 hover:underline"
+              className="text-blue-400 hover:text-blue-300 hover:underline"
             >
               Skapa ditt första inlägg →
             </Link>
@@ -42,13 +42,13 @@ export default async function BlogPage() {
             {posts.map((post) => (
               <article 
                 key={post.slug}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700 hover:border-gray-600 transition-all"
               >
                 <Link href={`/blog/${post.slug}`}>
-                  <h2 className="text-2xl font-bold mb-2 hover:text-blue-600">
+                  <h2 className="text-2xl font-bold mb-2 text-white hover:text-blue-400 transition-colors">
                     {post.title}
                   </h2>
-                  <p className="text-gray-500 text-sm mb-3">
+                  <p className="text-gray-400 text-sm mb-3">
                     {new Date(post.date).toLocaleDateString('sv-SE', {
                       year: 'numeric',
                       month: 'long',
@@ -56,9 +56,9 @@ export default async function BlogPage() {
                     })}
                   </p>
                   {post.excerpt && (
-                    <p className="text-gray-700 mb-4">{post.excerpt}</p>
+                    <p className="text-gray-300 mb-4">{post.excerpt}</p>
                   )}
-                  <span className="text-blue-600 hover:underline">
+                  <span className="text-blue-400 hover:text-blue-300 hover:underline">
                     Läs mer →
                   </span>
                 </Link>
