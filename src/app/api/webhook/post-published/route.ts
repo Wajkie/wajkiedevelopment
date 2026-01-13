@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+interface WebhookBody {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  date?: string;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json() as WebhookBody;
     const { slug, title, excerpt, date } = body;
 
     // Validera input
