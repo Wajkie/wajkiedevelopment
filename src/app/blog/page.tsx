@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 
 // Revalidera var 60:e sekund (ISR)
 export const revalidate = 60;
+// Force dynamic rendering (skippa pre-render under build)
+export const dynamic = 'force-dynamic';
 
 export default async function BlogPage() {
   // Hämta posts från databasen (snabbt!)

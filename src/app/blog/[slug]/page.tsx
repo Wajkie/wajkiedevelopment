@@ -10,6 +10,8 @@ interface Props {
 
 // Revalidera var 60:e sekund (ISR)
 export const revalidate = 60;
+// Force dynamic rendering (skippa pre-render under build)
+export const dynamic = 'force-dynamic';
 
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params;
