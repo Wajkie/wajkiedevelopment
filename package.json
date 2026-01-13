@@ -1,0 +1,38 @@
+{
+  "name": "wajkiedev",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "migrate:up": "tsx src/lib/migrate.ts up",
+    "migrate:down": "tsx src/lib/migrate.ts down"
+  },
+  "dependencies": {
+    "@types/pg": "^8.16.0",
+    "gray-matter": "^4.0.3",
+    "kysely": "^0.28.9",
+    "kysely-ctl": "^0.20.0",
+    "next": "16.1.1",
+    "octokit": "^5.0.5",
+    "pg": "^8.16.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}
