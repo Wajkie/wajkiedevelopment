@@ -53,3 +53,38 @@ export interface PostMetadata {
   date: string;
   excerpt: string;
 }
+
+// GitHub Repository types
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string | null;
+  html_url: string;
+  homepage: string | null;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  topics: string[];
+  created_at: string;
+  updated_at: string;
+  pushed_at: string;
+  fork: boolean;
+  archived: boolean;
+  has_workflows: boolean; // Har GitHub Actions/CI/CD
+}
+
+export interface SelectedProject {
+  repoId: number;
+  name: string;
+  description: string | null;
+  url: string;
+  homepage: string | null;
+  language: string | null;
+  stars: number;
+  topics: string[];
+  hasWorkflows: boolean;
+  lastCommit: string; // pushed_at från GitHub
+  deploymentUrl: string | null; // Custom deployment URL
+  order: number;
+}

@@ -1,6 +1,6 @@
 import { Octokit } from 'octokit';
 import matter from 'gray-matter';
-import type { Post, PostMetadata, GitHubFile, GitHubContent, PostFrontmatter } from '@/types';
+import type { Post, PostMetadata, GitHubFile, GitHubContent, PostFrontmatter, GitHubRepo } from '@/types';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER; // t.ex. "wajkie"
@@ -43,7 +43,7 @@ export async function getAllPostsFromGitHub(): Promise<PostMetadata[]> {
           const contentResponse = await fetch(file.download_url);
           const content = await contentResponse.text();
           const { data: frontmatter } = matter(content);
-          const typedFrontmatter = frontmatter as PostFrontmatter;
+          const typedFrontmatter: PostFrontmatter = frontmatter as PostFrontmatter;
 
           return {
             slug,
@@ -88,7 +88,7 @@ export async function getPostFromGitHub(slug: string): Promise<Post | null> {
     const contentResponse = await fetch(typedData.download_url);
     const fileContent = await contentResponse.text();
     const { data: frontmatter, content } = matter(fileContent);
-    const typedFrontmatter = frontmatter as PostFrontmatter;
+    const typedFrontmatter: PostFrontmatter = frontmatter as PostFrontmatter;
 
     return {
       slug,
@@ -158,3 +158,65 @@ ${content}`;
     return { success: false, error: errorMessage };
   }
 }
+
+// Hämta alla repos för användaren
+export async function getUserRepos(): Promise<GitHubRepo[]> {
+  if (!GITHUB_OWNER || !GITHUB_TOKEN) {
+    console.error('GitHub credentials saknas');
+    return [];
+  }
+
+  try {
+    const { data: repos } = await octokit.rest.repos.listForUser({
+      username: GITHUB_OWNER,
+      per_page: 100,
+      sort: 'updated',
+    });
+
+    // Kolla varje repo för workflows
+    const reposWithWorkflows = await Promise.all(
+      repos.map(async (repoData) => {
+        let hasWorkflows = false;
+        
+        try {
+          // Försök hämta .github/workflows mappen
+          await octokit.rest.repos.getContent({
+            owner: GITHUB_OWNER,
+            repo: repoData.name,
+            path: '.github/workflows',
+          });
+          hasWorkflows = true;
+        } catch {
+          // Mappen finns inte = inga workflows
+          hasWorkflows = false;
+        }
+
+        const repo: GitHubRepo = {
+          id: repoData.id,
+          name: repoData.name,
+          full_name: repoData.full_name,
+          description: repoData.description,
+          html_url: repoData.html_url,
+          homepage: repoData.homepage,
+          language: repoData.language,
+          stargazers_count: repoData.stargazers_count,
+          forks_count: repoData.forks_count,
+          topics: repoData.topics || [],
+          created_at: repoData.created_at,
+          updated_at: repoData.updated_at,
+          pushed_at: repoData.pushed_at,
+          fork: repoData.fork,
+          archived: repoData.archived,
+          has_workflows: hasWorkflows,
+        };
+        return repo;
+      })
+    );
+
+    return reposWithWorkflows;
+  } catch (error) {
+    console.error('Fel vid hämtning av repos:', error);
+    return [];
+  }
+}
+
