@@ -2,7 +2,11 @@
 // Only runs in development mode to catch accessibility issues early
 
 if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
-  import('@axe-core/react').then((axe) => {
+  Promise.all([
+    import('react'),
+    import('react-dom'),
+    import('@axe-core/react')
+  ]).then(([React, ReactDOM, axe]) => {
     axe.default(React, ReactDOM, 1000, {
       rules: [
         {
@@ -11,7 +15,7 @@ if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
         },
       ],
     });
-  });
+  }).catch(console.error);
 }
 
 export {};
