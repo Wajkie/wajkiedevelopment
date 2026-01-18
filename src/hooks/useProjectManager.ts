@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { GitHubRepo, SelectedProject } from '@/types';
+import { getProjects, getRepos, saveProjects as saveProjectsAction } from '@/lib/actions/projects';
 
 interface RepoLists {
   withPipelines: GitHubRepo[];
   withoutPipelines: GitHubRepo[];
 }
 
-interface ProjectsResponse {
-  projects: SelectedProject[];
-}
-
-export function useProjectManager() {
+export const useProjectManager = () => {
   const [repos, setRepos] = useState<RepoLists | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [deploymentUrls, setDeploymentUrls] = useState<Map<number, string>>(new Map());
@@ -21,18 +18,15 @@ export function useProjectManager() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [reposRes, projectsRes] = await Promise.all([
-          fetch('/api/repos'),
-          fetch('/api/projects'),
+        const [reposData, projectsData] = await Promise.all([
+          getRepos(),
+          getProjects(),
         ]);
 
-        const reposData = await reposRes.json() as RepoLists;
-        const projectsData = await projectsRes.json() as ProjectsResponse;
-
         setRepos(reposData);
-        setSelectedIds(new Set(projectsData.projects.map((p) => p.repoId)));
+        setSelectedIds(new Set(projectsData.map((p) => p.repoId)));
         setDeploymentUrls(
-          new Map(projectsData.projects.map((p) => [p.repoId, p.deploymentUrl || '']))
+          new Map(projectsData.map((p) => [p.repoId, p.deploymentUrl || '']))
         );
       } catch (error) {
         console.error('Fel vid hämtning:', error);
@@ -91,13 +85,8 @@ export function useProjectManager() {
       .filter((p): p is SelectedProject => p !== null);
 
     try {
-      const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projects }),
-      });
-
-      setMessage(res.ok ? '✅ Projekt sparade!' : '❌ Kunde inte spara');
+      await saveProjectsAction(projects);
+      setMessage('✅ Projekt sparade!');
     } catch (error) {
       console.error('Fel vid sparande:', error);
       setMessage('❌ Kunde inte spara');
@@ -117,4 +106,4 @@ export function useProjectManager() {
     updateDeploymentUrl,
     saveProjects,
   };
-}
+};
