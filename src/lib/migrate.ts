@@ -5,28 +5,37 @@ config({ path: path.join(__dirname, '../../.env.local') });
 
 // NU kan vi importera db (efter env är laddad)
 import { promises as fs } from 'fs';
-import { Migrator, FileMigrationProvider } from 'kysely';
+import { Migrator, FileMigrationProvider, MigrationResult } from 'kysely';
 import { db } from './db';
 
-async function migrateToLatest() {
-  const migrator = new Migrator({
-    db,
-    provider: new FileMigrationProvider({
-      fs,
-      path,
-      migrationFolder: path.join(__dirname, '../../migrations'),
-    }),
-  });
+// Helper to create migrator instance
+const createMigrator = () => new Migrator({
+  db,
+  provider: new FileMigrationProvider({
+    fs,
+    path,
+    migrationFolder: path.join(__dirname, '../../migrations'),
+  }),
+});
 
-  const { error, results } = await migrator.migrateToLatest();
-
+// Helper to log migration results
+const logResults = (results: MigrationResult[] | undefined, isDown = false) => {
   results?.forEach((it) => {
     if (it.status === 'Success') {
-      console.log(`✅ Migration "${it.migrationName}" was executed successfully`);
+      const action = isDown ? 'was rolled back' : 'was executed';
+      console.log(`✅ Migration "${it.migrationName}" ${action} successfully`);
     } else if (it.status === 'Error') {
-      console.error(`❌ Failed to execute migration "${it.migrationName}"`);
+      const action = isDown ? 'roll back' : 'execute';
+      console.error(`❌ Failed to ${action} migration "${it.migrationName}"`);
     }
   });
+};
+
+const migrateToLatest = async () => {
+  const migrator = createMigrator();
+  const { error, results } = await migrator.migrateToLatest();
+
+  logResults(results, false);
 
   if (error) {
     console.error('❌ Failed to migrate');
@@ -35,27 +44,13 @@ async function migrateToLatest() {
   }
 
   await db.destroy();
-}
+};
 
-async function migrateDown() {
-  const migrator = new Migrator({
-    db,
-    provider: new FileMigrationProvider({
-      fs,
-      path,
-      migrationFolder: path.join(__dirname, '../../migrations'),
-    }),
-  });
-
+const migrateDown = async () => {
+  const migrator = createMigrator();
   const { error, results } = await migrator.migrateDown();
 
-  results?.forEach((it) => {
-    if (it.status === 'Success') {
-      console.log(`✅ Migration "${it.migrationName}" was rolled back successfully`);
-    } else if (it.status === 'Error') {
-      console.error(`❌ Failed to rollback migration "${it.migrationName}"`);
-    }
-  });
+  logResults(results, true);
 
   if (error) {
     console.error('❌ Failed to rollback');
@@ -64,7 +59,7 @@ async function migrateDown() {
   }
 
   await db.destroy();
-}
+};
 
 const command = process.argv[2];
 

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { db } from '@/lib/db';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { PageContainer, PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui';
 
 // Revalidera var 60:e sekund (ISR)
 export const revalidate = 60;
@@ -17,21 +18,23 @@ export default async function BlogPage() {
     .execute();
 
   return (
-    <main className="min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Min blogg</h1>
+    <PageContainer maxWidth="6xl">
+      <PageHeader 
+        title="Min blogg"
+        description="Tankar, lärdomar och tekniska djupdykningar"
+        action={
           <Button asChild>
             <Link href="/admin">
               + Nytt inlägg
             </Link>
           </Button>
-        </header>
+        }
+      />
 
         {posts.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8">
-              <p className="text-muted-foreground mb-4">Inga blogginlägg än.</p>
+          <Card className="max-w-md mx-auto">
+            <CardContent className="text-center py-12">
+              <p className="text-xl text-muted-foreground mb-6">Inga blogginlägg än.</p>
               <Button asChild>
                 <Link href="/admin">
                   Skapa ditt första inlägg →
@@ -40,36 +43,38 @@ export default async function BlogPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <Card key={post.slug} as="article">
-                <Link href={`/blog/${post.slug}`} className="block">
-                  <CardHeader>
-                    <CardTitle as="h2" className="hover:text-primary transition-colors">
-                      {post.title}
-                    </CardTitle>
-                    <time className="text-muted-foreground text-sm" dateTime={post.date}>
+              <Card key={post.slug} as="article" className="group hover:border-primary/50 transition-all flex flex-col h-full [box-shadow:var(--shadow-md)] hover:[box-shadow:var(--shadow-lg)]">
+                <Link href={`/blog/${post.slug}`} className="flex flex-col h-full">
+                  <CardHeader className="flex-1">
+                    <time className="text-xs text-muted-foreground mb-2 block" dateTime={post.date}>
                       {new Date(post.date).toLocaleDateString('sv-SE', {
                         year: 'numeric',
-                        month: 'long',
+                        month: 'short',
                         day: 'numeric'
                       })}
                     </time>
+                    <CardTitle as="h2" className="group-hover:text-primary transition-colors text-xl mb-3">
+                      {post.title}
+                    </CardTitle>
+                    {post.excerpt && (
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                    )}
                   </CardHeader>
-                  {post.excerpt && (
-                    <CardContent>
-                      <p className="text-foreground/80 mb-4">{post.excerpt}</p>
-                      <span className="text-primary hover:text-accent transition-colors">
-                        Läs mer →
-                      </span>
-                    </CardContent>
-                  )}
+                  <CardContent className="pt-0">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-primary/20 bg-primary/5 text-sm text-primary group-hover:bg-primary/10 group-hover:border-primary/40 transition-all">
+                      Läs mer
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </span>
+                  </CardContent>
                 </Link>
               </Card>
             ))}
           </div>
         )}
-      </div>
-    </main>
+    </PageContainer>
   );
 }

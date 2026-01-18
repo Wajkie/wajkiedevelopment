@@ -1,6 +1,6 @@
 import { Octokit } from 'octokit';
 import matter from 'gray-matter';
-import type { Post, PostMetadata, GitHubFile, GitHubContent, PostFrontmatter, GitHubRepo } from '@/types';
+import type { Post, PostMetadata, GitHubFile, GitHubContent, PostFrontmatter, GitHubRepo, NpmSearchResponse, NpmPackageObject } from '@/types';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER; // t.ex. "wajkie"
@@ -13,7 +13,7 @@ const octokit = new Octokit({
 });
 
 // Hämta alla markdown-filer från GitHub
-export async function getAllPostsFromGitHub(): Promise<PostMetadata[]> {
+export const getAllPostsFromGitHub = async (): Promise<PostMetadata[]> => {
   if (!GITHUB_OWNER || !GITHUB_REPO) {
     console.error('GitHub credentials saknas');
     return [];
@@ -41,7 +41,9 @@ export async function getAllPostsFromGitHub(): Promise<PostMetadata[]> {
             throw new Error(`No download URL for ${file.name}`);
           }
           
-          const contentResponse = await fetch(file.download_url);
+          const contentResponse = await fetch(file.download_url, {
+            next: { revalidate: 1800 } // Cache for 30 minutes
+          });
           const content = await contentResponse.text();
           const { data: frontmatter } = matter(content);
           const typedFrontmatter: PostFrontmatter = frontmatter as PostFrontmatter;
@@ -61,10 +63,10 @@ export async function getAllPostsFromGitHub(): Promise<PostMetadata[]> {
     console.error('Fel vid hämtning av posts från GitHub:', error);
     return [];
   }
-}
+};
 
 // Hämta en specifik post från GitHub
-export async function getPostFromGitHub(slug: string): Promise<Post | null> {
+export const getPostFromGitHub = async (slug: string): Promise<Post | null> => {
   if (!GITHUB_OWNER || !GITHUB_REPO) {
     console.error('GitHub credentials saknas');
     return null;
@@ -86,7 +88,9 @@ export async function getPostFromGitHub(slug: string): Promise<Post | null> {
       throw new Error(`No download URL for ${slug}`);
     }
     
-    const contentResponse = await fetch(typedData.download_url);
+    const contentResponse = await fetch(typedData.download_url, {
+      next: { revalidate: 1800 } // Cache for 30 minutes
+    });
     const fileContent = await contentResponse.text();
     const { data: frontmatter, content } = matter(fileContent);
     const typedFrontmatter: PostFrontmatter = frontmatter as PostFrontmatter;
@@ -102,16 +106,16 @@ export async function getPostFromGitHub(slug: string): Promise<Post | null> {
     console.error(`Fel vid hämtning av post ${slug}:`, error);
     return null;
   }
-}
+};
 
 // Pusha nytt inlägg till GitHub
-export async function pushPostToGitHub(
+export const pushPostToGitHub = async (
   slug: string,
   title: string,
   date: string,
   excerpt: string,
   content: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string }> => {
   if (!GITHUB_OWNER || !GITHUB_REPO || !GITHUB_TOKEN) {
     return { success: false, error: 'GitHub credentials saknas' };
   }
@@ -158,10 +162,10 @@ ${content}`;
     console.error('Fel vid push till GitHub:', error);
     return { success: false, error: errorMessage };
   }
-}
+};
 
 // Hämta alla repos för användaren
-export async function getUserRepos(): Promise<GitHubRepo[]> {
+export const getUserRepos = async (): Promise<GitHubRepo[]> => {
   if (!GITHUB_OWNER || !GITHUB_TOKEN) {
     console.error('GitHub credentials saknas');
     return [];
@@ -219,10 +223,10 @@ export async function getUserRepos(): Promise<GitHubRepo[]> {
     console.error('Fel vid hämtning av repos:', error);
     return [];
   }
-}
+};
 
 // Hämta senaste workflow runs för ett repo
-export async function getWorkflowRuns(repoName: string) {
+export const getWorkflowRuns = async (repoName: string) => {
   if (!GITHUB_OWNER || !GITHUB_TOKEN) {
     return [];
   }
@@ -246,10 +250,10 @@ export async function getWorkflowRuns(repoName: string) {
   } catch {
     return [];
   }
-}
+};
 
 // Hämta senaste commit för ett repo
-export async function getLatestCommit(repoName: string) {
+export const getLatestCommit = async (repoName: string) => {
   if (!GITHUB_OWNER || !GITHUB_TOKEN) {
     return null;
   }
@@ -274,26 +278,57 @@ export async function getLatestCommit(repoName: string) {
   } catch {
     return null;
   }
-}
+};
 
 // Hämta antal publicerade npm-paket för användaren
-export async function getNpmPackageCount(): Promise<number> {
+export const getNpmPackageCount = async (): Promise<number> => {
   if (!NPM_USERNAME) {
     return 0;
   }
 
   try {
     const response = await fetch(
-      `https://registry.npmjs.org/-/v1/search?text=author:${NPM_USERNAME}&size=250`
+      `https://registry.npmjs.org/-/v1/search?text=author:${NPM_USERNAME}&size=250`,
+      {
+        next: { revalidate: 3600 } // Cache for 1 hour
+      }
     );
 
     if (!response.ok) {
       return 0;
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { total?: number };
     return data.total ?? 0;
   } catch {
     return 0;
   }
-}
+};
+
+// Hämta alla npm-paket för användaren med fullständig information
+export const getNpmPackages = async (): Promise<NpmPackageObject[]> => {
+  if (!NPM_USERNAME) {
+    console.error('NPM_USERNAME saknas');
+    return [];
+  }
+
+  try {
+    const response = await fetch(
+      `https://registry.npmjs.org/-/v1/search?text=author:${NPM_USERNAME}&size=250`,
+      {
+        next: { revalidate: 3600 } // Cache for 1 hour
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to fetch npm packages');
+      return [];
+    }
+
+    const data: NpmSearchResponse = await response.json();
+    return data.objects || [];
+  } catch (error) {
+    console.error('Fel vid hämtning av npm-paket:', error);
+    return [];
+  }
+};

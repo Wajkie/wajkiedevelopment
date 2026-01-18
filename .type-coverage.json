@@ -1,4 +1,5 @@
 {
+  "strict": true,
   "threshold": 95,
   "atLeast": 90,
   "ignoreFiles": [
@@ -6,6 +7,8 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     "migrations/**/*.ts",
-    ".next/**/*.ts"
+    ".next/**/*.ts",
+    ".next/**/*.js",
+    ".next/**"
   ]
 }

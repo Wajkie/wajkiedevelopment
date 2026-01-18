@@ -4,6 +4,8 @@ import { db } from '@/lib/db';
 import { getAllPostsFromGitHub, getUserRepos } from '@/lib/github';
 import DashboardClient from './DashboardClient';
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
 export default async function AdminPage() {
   const session = await getSession();
   
@@ -12,7 +14,7 @@ export default async function AdminPage() {
   }
 
   // Fetch dashboard stats
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(Date.now() - SEVEN_DAYS_MS);
   const [recentVisits, blogPosts, repos] = await Promise.all([
     // Recent visits (last 7 days)
     db

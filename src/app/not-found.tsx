@@ -1,4 +1,4 @@
-import CVRequestForm from '@/components/CVRequestForm';
+import { CVRequestForm } from '@/components/common';
 
 export default function NotFound() {
   return (

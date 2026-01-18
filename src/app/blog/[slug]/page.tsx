@@ -7,8 +7,9 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import 'highlight.js/styles/github-dark.css';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { ScrollToTopButton } from '@/components/layout';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -78,6 +79,15 @@ export default async function BlogPost({ params }: Props) {
             {post.content}
           </ReactMarkdown>
         </CardContent>
+
+        <CardFooter className="flex justify-between pt-8 border-t border-border">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/blog">
+              ← Tillbaka till bloggen
+            </Link>
+          </Button>
+          <ScrollToTopButton />
+        </CardFooter>
       </Card>
     </main>
   );
