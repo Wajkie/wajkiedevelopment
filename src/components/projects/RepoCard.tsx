@@ -9,7 +9,7 @@ interface RepoCardProps {
   onUrlChange: (url: string) => void;
 }
 
-export function RepoCard({ repo, isSelected, deploymentUrl, onToggle, onUrlChange }: RepoCardProps) {
+export const RepoCard = ({ repo, isSelected, deploymentUrl, onToggle, onUrlChange }: RepoCardProps) => {
   return (
     <div
       className={cn(
@@ -68,9 +68,9 @@ export function RepoCard({ repo, isSelected, deploymentUrl, onToggle, onUrlChang
       </div>
     </div>
   );
-}
+};
 
-function Badge({ variant, children }: { variant: 'accent' | 'secondary'; children: React.ReactNode }) {
+const Badge = ({ variant, children }: { variant: 'accent' | 'secondary'; children: React.ReactNode }) => {
   return (
     <span
       className={cn(
@@ -82,4 +82,4 @@ function Badge({ variant, children }: { variant: 'accent' | 'secondary'; childre
       {children}
     </span>
   );
-}
+};

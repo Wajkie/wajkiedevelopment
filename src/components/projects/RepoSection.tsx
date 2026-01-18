@@ -10,7 +10,7 @@ interface RepoSectionProps {
   onUrlChange: (id: number, url: string) => void;
 }
 
-export function RepoSection({ title, repos, selectedIds, deploymentUrls, onToggle, onUrlChange }: RepoSectionProps) {
+export const RepoSection = ({ title, repos, selectedIds, deploymentUrls, onToggle, onUrlChange }: RepoSectionProps) => {
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6">
       <div className="flex items-center gap-2 mb-4">
