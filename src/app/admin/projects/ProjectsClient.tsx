@@ -1,11 +1,13 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui';
 import { RepoSection } from '@/components/projects/RepoSection';
 import { useProjectManager } from '@/hooks/useProjectManager';
 import { cn } from '@/lib/cn';
 
 export default function ProjectsClient() {
+  const router = useRouter();
   const {
     repos,
     selectedIds,
@@ -54,9 +56,14 @@ export default function ProjectsClient() {
                 Välj vilka repositories som ska visas på din portfolio
               </p>
             </div>
-            <Button onClick={saveProjects} disabled={saving} variant="default">
-              {saving ? 'Sparar...' : `Spara val (${selectedIds.size})`}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => router.push('/admin')} variant="outline">
+                ← Dashboard
+              </Button>
+              <Button onClick={saveProjects} disabled={saving} variant="default">
+                {saving ? 'Sparar...' : `Spara val (${selectedIds.size})`}
+              </Button>
+            </div>
           </div>
           
           {message && (
