@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import { Label } from '@/components/ui/Label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { Label } from '@/components/ui';
+import { setupAuth } from '@/lib/actions/auth';
 
 export default function SetupPage() {
   const [data, setData] = useState<{
@@ -16,8 +17,7 @@ export default function SetupPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/auth/setup')
-      .then(res => res.json())
+    setupAuth()
       .then(setData)
       .finally(() => setLoading(false));
   }, []);

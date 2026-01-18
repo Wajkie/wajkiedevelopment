@@ -2,19 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import Button from '@/components/ui/Button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui';
+import { Input } from '@/components/ui';
+import { Label } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { verifyAuthCode } from '@/lib/actions/auth';
 
 export default function LoginPage() {
   const router = useRouter();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
-
-  interface SignInResponse {
-    error?: string;
-  }
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,23 +20,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-
-      const data = await response.json() as SignInResponse;
-
-      if (response.ok) {
-        router.push('/admin');
-        router.refresh();
-      } else {
-        setError(data.error || 'Ogiltig kod');
-        setCode('');
-      }
-    } catch {
-      setError('Något gick fel');
+      await verifyAuthCode(code);
+      router.push('/admin');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Något gick fel');
+      setCode('');
     } finally {
       setLoading(false);
     }

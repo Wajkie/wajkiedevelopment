@@ -1,6 +1,7 @@
 import { Kysely, sql } from 'kysely';
 
-export async function up(db: Kysely<unknown>): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const up = async (db: Kysely<any>) => {
   // Skapa posts tabell
   await db.schema
     .createTable('posts')
@@ -11,10 +12,10 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('excerpt', 'text')
     .addColumn('date', 'date', (col) => col.notNull())
     .addColumn('created_at', 'timestamp', (col) =>
-      col.defaultTo(sql`NOW()`).notNull()
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .addColumn('updated_at', 'timestamp', (col) =>
-      col.defaultTo(sql`NOW()`).notNull()
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .execute();
 
@@ -32,8 +33,9 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .on('posts')
     .column('slug')
     .execute();
-}
+};
 
-export async function down(db: Kysely<unknown>): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const down = async (db: Kysely<any>) => {
   await db.schema.dropTable('posts').ifExists().execute();
-}
+};
