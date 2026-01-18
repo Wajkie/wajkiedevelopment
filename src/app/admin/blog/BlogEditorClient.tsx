@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import { Textarea } from '@/components/ui/Textarea';
-import MarkdownToolbar from '@/components/MarkdownToolbar';
-import MarkdownGuide from '@/components/MarkdownGuide';
-import Button from '@/components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
+import { Input } from '@/components/ui';
+import { Label } from '@/components/ui';
+import { Textarea } from '@/components/ui';
+import { MarkdownToolbar, MarkdownGuide } from '@/components/blog';
+import { Button } from '@/components/ui';
+import { logoutUser } from '@/lib/actions/auth';
+import { createPost } from '@/lib/actions/posts';
+import { useAnnouncer } from '@wajkie/react-a11y';
 
 export default function AdminClient() {
   const router = useRouter();
@@ -23,16 +25,18 @@ export default function AdminClient() {
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  
+  const announce = useAnnouncer();
 
-  interface ApiResponse {
-    slug?: string;
-    error?: string;
-  }
+  useEffect(() => {
+    if (message) {
+      const isSuccess = message.includes('✅');
+      announce(message.replace(/✅|❌/g, '').trim(), isSuccess ? 'polite' : 'assertive');
+    }
+  }, [message, announce]);
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/auth/signin');
-    router.refresh();
+    await logoutUser();
   };
 
   // Auto-generera slug från titel
@@ -54,24 +58,13 @@ export default function AdminClient() {
     setMessage('');
 
     try {
-      const response = await fetch('/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json() as ApiResponse;
-
-      if (response.ok) {
-        setMessage('✅ Blogginlägg sparat!');
-        setTimeout(() => {
-          router.push(`/blog/${data.slug}`);
-        }, 1500);
-      } else {
-        setMessage(`❌ Fel: ${data.error}`);
-      }
+      const result = await createPost(formData);
+      setMessage('✅ Blogginlägg sparat!');
+      setTimeout(() => {
+        router.push(`/blog/${result.slug}`);
+      }, 1500);
     } catch (error) {
-      setMessage('❌ Kunde inte spara inlägg');
+      setMessage(`❌ Fel: ${error instanceof Error ? error.message : 'Kunde inte spara inlägg'}`);
       console.error(error);
     } finally {
       setSaving(false);
@@ -93,26 +86,32 @@ export default function AdminClient() {
                   Skriv markdown, förhandsgranska och publicera direkt till GitHub
                 </CardDescription>
               </div>
-              <nav aria-label="Huvudnavigering">
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    onClick={() => setShowGuide(true)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    📖 Guide
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={handleLogout}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    Logga ut
-                  </Button>
-                </div>
-              </nav>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => router.push('/admin')}
+                  variant="outline"
+                  size="sm"
+                >
+                  ← Dashboard
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => setShowGuide(true)}
+                  variant="outline"
+                  size="sm"
+                >
+                  📖 Guide
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Logga ut
+                </Button>
+              </div>
             </div>
           </CardHeader>
         </Card>
