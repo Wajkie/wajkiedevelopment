@@ -1,6 +1,7 @@
 import { Kysely, sql } from 'kysely';
 
-export async function up(db: Kysely<unknown>): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const up = async (db: Kysely<any>) => {
   // Skapa projects tabell
   await db.schema
     .createTable('projects')
@@ -19,10 +20,10 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('deployment_url', 'text')
     .addColumn('order_index', 'integer', (col) => col.notNull().defaultTo(0))
     .addColumn('created_at', 'timestamp', (col) =>
-      col.defaultTo(sql`NOW()`).notNull()
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .addColumn('updated_at', 'timestamp', (col) =>
-      col.defaultTo(sql`NOW()`).notNull()
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .execute();
 
@@ -40,8 +41,9 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .on('projects')
     .column('order_index')
     .execute();
-}
+};
 
-export async function down(db: Kysely<unknown>): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const down = async (db: Kysely<any>) => {
   await db.schema.dropTable('projects').ifExists().execute();
-}
+};
