@@ -1,0 +1,11 @@
+{
+  "threshold": 95,
+  "atLeast": 90,
+  "ignoreFiles": [
+    "**/*.d.ts",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "migrations/**/*.ts",
+    ".next/**/*.ts"
+  ]
+}

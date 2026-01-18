@@ -1,0 +1,12 @@
+threshold: 0
+reporters:
+  - console
+  - html
+ignore:
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
+  - "**/node_modules/**"
+  - "**/.next/**"
+format:
+  - typescript
+  - tsx

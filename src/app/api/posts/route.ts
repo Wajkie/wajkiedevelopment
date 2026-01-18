@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 import { pushPostToGitHub } from '@/lib/github';
 
+interface PostBody {
+  slug: string;
+  title: string;
+  date?: string;
+  excerpt?: string;
+  content: string;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json() as PostBody;
     const { slug, title, date, excerpt, content } = body;
 
     // Validera input

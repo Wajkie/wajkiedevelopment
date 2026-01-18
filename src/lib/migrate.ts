@@ -1,6 +1,11 @@
-import { promises as fs } from 'fs';
-import { Kysely, Migrator, FileMigrationProvider } from 'kysely';
+// Ladda .env.local FÖRST innan något annat
+import { config } from 'dotenv';
 import * as path from 'path';
+config({ path: path.join(__dirname, '../../.env.local') });
+
+// NU kan vi importera db (efter env är laddad)
+import { promises as fs } from 'fs';
+import { Migrator, FileMigrationProvider } from 'kysely';
 import { db } from './db';
 
 async function migrateToLatest() {
