@@ -45,8 +45,8 @@ export default function CVRequestForm() {
   return (
     <Card className="max-w-2xl text-center">
       <CardHeader>
-        <div className="text-8xl mb-4">🤷‍♂️</div>
-        <CardTitle as="h1" className="text-6xl mb-4">
+        <div className="text-5xl sm:text-6xl md:text-8xl mb-4">🤷‍♂️</div>
+        <CardTitle as="h1" className="text-4xl sm:text-5xl md:text-6xl mb-4">
           404
         </CardTitle>
         <CardDescription className="text-xl">

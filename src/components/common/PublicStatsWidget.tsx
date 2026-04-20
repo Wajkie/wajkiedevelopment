@@ -56,21 +56,21 @@ export function PublicStatsWidget() {
         📊 Live Stats
       </h3>
       
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-lg sm:text-2xl font-bold text-primary">
             {stats.totalVisits.toLocaleString()}
           </div>
           <div className="text-xs text-muted-foreground mt-1">Total Visits</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-lg sm:text-2xl font-bold text-primary">
             {stats.uniqueVisitors.toLocaleString()}
           </div>
           <div className="text-xs text-muted-foreground mt-1">Visitors</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-lg sm:text-2xl font-bold text-primary">
             {stats.recentVisits.toLocaleString()}
           </div>
           <div className="text-xs text-muted-foreground mt-1">Last 7 Days</div>
@@ -85,7 +85,7 @@ export function PublicStatsWidget() {
               <div key={page.path} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground w-4">#{idx + 1}</span>
-                  <span className="font-mono text-xs truncate max-w-[200px]">
+                  <span className="font-mono text-xs truncate max-w-[120px] sm:max-w-[200px]">
                     {page.path}
                   </span>
                 </div>

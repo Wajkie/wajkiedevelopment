@@ -128,7 +128,7 @@ export default function MarkdownToolbar({ onInsert, textareaRef }: MarkdownToolb
           onClick={() => handleClick(config)}
           variant="secondary"
           size="sm"
-          className="min-w-[2.5rem] flex items-center justify-center"
+          className="min-w-[2.75rem] min-h-[2.75rem] flex items-center justify-center"
           aria-label={config.label}
         >
           {config.icon}

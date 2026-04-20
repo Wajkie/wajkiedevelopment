@@ -68,7 +68,7 @@ function PublicStatsWidgetSkeleton() {
       </CardHeader>
       <div className="p-6 space-y-4 animate-pulse">
         <span className="sr-only" aria-live="polite">Laddar live statistik...</span>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {[1, 2, 3].map((i) => (
             <div key={i} aria-hidden="true">
               <div className="h-3 bg-muted rounded w-full mb-2"></div>
@@ -140,7 +140,7 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto mb-12">
         <Card className="text-center relative overflow-hidden">
-          <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 bg-red-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -148,7 +148,7 @@ export default async function Home() {
             LIVE
           </div>
           <CardHeader>
-            <CardTitle as="h1" className="text-5xl mb-4">
+            <CardTitle as="h1" className="text-3xl sm:text-4xl md:text-5xl mb-4">
               Wajkie Development
             </CardTitle>
             <CardDescription className="text-lg">

@@ -41,7 +41,7 @@ export default async function PackagesPage() {
       />
       
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-12">
         <div className="p-4 bg-card border border-border rounded-lg">
           <div className="text-2xl font-bold text-primary">{packages.length}</div>
           <div className="text-sm text-muted-foreground">Totalt Paket</div>

@@ -38,7 +38,7 @@ export const SkillFieldArray = ({
       
       <div className="space-y-3">
         {fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[1fr,80px,100px,auto] gap-2">
+          <div key={field.id} className="grid grid-cols-1 gap-2 md:grid-cols-[1fr,80px,100px,auto]">
             <Input
               placeholder={placeholder}
               {...register(`${fieldName}.${index}.name` as const, { required: true })}

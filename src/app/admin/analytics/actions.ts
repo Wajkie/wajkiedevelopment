@@ -21,7 +21,8 @@ export async function createToken(formData: {
   const token = crypto.randomBytes(32).toString('hex');
   
   // Hash token for storage
-  const tokenHash = await bcrypt.hash(token, 15);
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
+  const tokenHash = await bcrypt.hash(token, saltRounds);
 
   // Insert into database
   const newToken = await db

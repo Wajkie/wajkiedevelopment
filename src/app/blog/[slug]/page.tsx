@@ -38,7 +38,7 @@ export default async function BlogPost({ params }: Props) {
             </Link>
           </Button>
 
-          <h1 className="text-4xl font-bold mb-3">{post.title}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">{post.title}</h1>
           <time className="text-muted-foreground" dateTime={post.date}>
             {new Date(post.date).toLocaleDateString('sv-SE', {
               year: 'numeric',
@@ -48,11 +48,11 @@ export default async function BlogPost({ params }: Props) {
           </time>
         </CardHeader>
 
-        <CardContent className="prose prose-invert prose-lg max-w-none 
+        <CardContent className="prose prose-invert prose-base md:prose-lg max-w-none
           prose-headings:text-foreground prose-headings:font-bold
-          prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
-          prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-6 prose-h2:border-b prose-h2:border-border prose-h2:pb-2
-          prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-5
+          prose-h1:text-2xl sm:prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
+          prose-h2:text-xl sm:prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-6 prose-h2:border-b prose-h2:border-border prose-h2:pb-2
+          prose-h3:text-lg sm:prose-h3:text-xl md:prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-5
           prose-p:text-foreground/80 prose-p:leading-relaxed prose-p:mb-4
           prose-a:text-primary prose-a:hover:text-accent prose-a:underline prose-a:underline-offset-2
           prose-strong:text-foreground prose-strong:font-semibold

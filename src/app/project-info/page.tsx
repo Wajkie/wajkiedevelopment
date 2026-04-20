@@ -94,7 +94,7 @@ export default function ProjectInfoPage() {
           {projectInfo.architecture.layers.map((layer, index) => (
             <div 
               key={layer.name} 
-              className="border border-border rounded-lg p-6 hover:border-primary/50 transition-colors"
+              className="border border-border rounded-lg p-6 hover:border-primary/50 transition-colors max-sm:!ml-0"
               style={{ marginLeft: `${index * 20}px` }}
             >
               <div className="flex items-start justify-between mb-2">

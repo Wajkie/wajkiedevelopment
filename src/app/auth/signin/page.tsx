@@ -36,7 +36,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold flex items-center gap-2">
+            <CardTitle className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
               <span aria-hidden="true">🔐</span>
               Admin Login
             </CardTitle>

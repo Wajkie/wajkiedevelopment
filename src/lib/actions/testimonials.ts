@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
 import { getSession } from '@/lib/auth';
 
-const SALT_ROUNDS = 12;
+const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
 
 // Submit a new testimonial
 export async function submitTestimonial(data: {
@@ -27,7 +27,7 @@ export async function submitTestimonial(data: {
     throw new Error('Meddelandet måste vara mellan 10 och 1000 tecken');
   }
 
-  // Hash name and email with bcrypt (12 rounds)
+  // Hash name and email with bcrypt
   const nameHash = await bcrypt.hash(data.name.toLowerCase().trim(), SALT_ROUNDS);
   const emailHash = await bcrypt.hash(data.email.toLowerCase().trim(), SALT_ROUNDS);
 

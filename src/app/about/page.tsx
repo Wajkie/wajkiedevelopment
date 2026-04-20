@@ -54,7 +54,7 @@ export default async function AboutPage() {
       {/* Hero Section */}
       <div className="text-center mb-16 space-y-6 animate-fade-in">
         <div className="inline-block">
-          <h1 className="text-5xl md:text-6xl py-5 font-bold bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl py-5 font-bold bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
             {bio.name}
           </h1>
         </div>
@@ -114,7 +114,7 @@ export default async function AboutPage() {
               <span className="text-2xl">🎨</span>
               Frontend
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {bio.skills.frontend.map((skill, index) => (
                 <SkillCard key={skill.name} {...skill} index={index} />
               ))}
@@ -127,7 +127,7 @@ export default async function AboutPage() {
               <span className="text-2xl">⚙️</span>
               Backend
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {bio.skills.backend.map((skill, index) => (
                 <SkillCard key={skill.name} {...skill} index={index} />
               ))}
@@ -140,7 +140,7 @@ export default async function AboutPage() {
               <span className="text-2xl">🛠️</span>
               Tools & Workflow
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {bio.skills.tools.map((skill, index) => (
                 <SkillCard key={skill.name} {...skill} index={index} />
               ))}
@@ -154,7 +154,7 @@ export default async function AboutPage() {
         <h2 className="text-3xl font-bold mb-12 text-center animate-fade-in-up">
           Vad jag värdesätter
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {bio.values.map((value, index) => (
             <ValueCard key={value.title} {...value} index={index} />
           ))}

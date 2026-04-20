@@ -36,14 +36,14 @@ export default function TestimonialsClient() {
       <main className="min-h-screen bg-background py-12 px-4">
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
               Testimonials
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Se vad andra säger om att jobba med mig. Har vi samarbetat? Lämna gärna ditt eget testimonial!
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
@@ -97,7 +97,7 @@ export default function TestimonialsClient() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {testimonials.map((testimonial) => (
               <Card
                 key={testimonial.id}

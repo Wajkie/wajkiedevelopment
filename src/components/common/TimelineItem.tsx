@@ -8,10 +8,11 @@ type Props = {
 
 export const TimelineItem = ({ entry, isLeft }: Props) => {
   return (
-    <div className={`flex gap-8 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}>
+    // Mobile: single column, dot on top. md+: alternating two-column layout.
+    <div className={`flex flex-col md:flex-row md:gap-8 ${!isLeft ? 'md:flex-row-reverse' : ''}`}>
       {/* Content */}
-      <div className={`flex-1 ${isLeft ? 'text-right' : 'text-left'}`}>
-        <div className="inline-block bg-card border border-border rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow">
+      <div className={`flex-1 mb-4 md:mb-0 ${isLeft ? 'md:text-right' : 'md:text-left'}`}>
+        <div className="inline-block bg-card border border-border rounded-lg p-4 sm:p-6 shadow-lg hover:shadow-xl transition-shadow w-full md:w-auto">
           {/* Header */}
           <div className="mb-4">
             <div className="flex items-center gap-2 justify-between mb-2">
@@ -22,7 +23,7 @@ export const TimelineItem = ({ entry, isLeft }: Props) => {
                 </span>
               )}
             </div>
-            <h3 className="text-2xl font-bold mb-1">{entry.title}</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-1">{entry.title}</h3>
             <time className="text-sm text-muted-foreground">{entry.date}</time>
           </div>
 
@@ -92,14 +93,14 @@ export const TimelineItem = ({ entry, isLeft }: Props) => {
         </div>
       </div>
 
-      {/* Timeline dot */}
-      <div className="relative flex flex-col items-center">
+      {/* Timeline dot — hidden on mobile, visible on md+ */}
+      <div className="hidden md:flex relative flex-col items-center">
         <div className="w-4 h-4 rounded-full bg-primary ring-4 ring-background border-2 border-primary" />
         <div className="w-0.5 h-full bg-border" />
       </div>
 
-      {/* Spacer */}
-      <div className="flex-1" />
+      {/* Spacer (desktop only) */}
+      <div className="hidden md:block flex-1" />
     </div>
   );
 };

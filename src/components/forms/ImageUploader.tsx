@@ -114,7 +114,7 @@ export const ImageUploader = ({ images, onImagesChange }: Props) => {
       </div>
 
       {images.length > 0 && (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
           {images.map((imageUrl, index) => (
             <div key={index} className="relative group">
               <div className="relative aspect-video rounded overflow-hidden border border-border">

@@ -37,8 +37,8 @@ export default async function JourneyPage() {
         </div>
       ) : (
         <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-border" />
+          {/* Timeline line — hidden on mobile, shown from md up */}
+          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-border" />
 
           {/* Timeline items */}
           <div className="space-y-12">

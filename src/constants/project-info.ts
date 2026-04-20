@@ -20,7 +20,7 @@ export const projectInfo = {
       icon: '📊',
       items: [
         { name: 'Privacy-First Analytics', description: 'SHA-256 IP hashing, no cookies, GDPR-compliant visitor tracking' },
-        { name: 'Token-Based API Auth', description: 'Bcrypt (15 rounds) hashed tokens with rate limiting per project' },
+        { name: 'Token-Based API Auth', description: 'Bcrypt hashed tokens with rate limiting per project' },
         { name: 'Action Tracking', description: 'Track visits, clicks, scrolls, downloads, and shares' },
         { name: 'Real-Time Dashboard', description: 'Live stats with auto-refresh (30s polling) and admin filtering' },
         { name: 'Public Stats Widget', description: 'Visitor-facing metrics (total visits, unique visitors, popular pages)' },
@@ -84,7 +84,7 @@ export const projectInfo = {
       { name: 'Kysely', version: '0.27.4', description: 'Type-safe SQL query builder with CamelCase plugin' },
       { name: 'PostgreSQL (Neon)', description: 'Serverless Postgres with connection pooling' },
       { name: 'Iron Session', version: '8.0.3', description: 'Encrypted stateless session management' },
-      { name: 'bcryptjs', version: '2.4.3', description: 'Password hashing (15 salt rounds)' },
+      { name: 'bcryptjs', version: '2.4.3', description: 'Secure password and token hashing' },
     ],
     integrations: [
       { name: 'Octokit', version: '4.0.2', description: 'GitHub API client for repo and content management' },
