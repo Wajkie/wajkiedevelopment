@@ -3,8 +3,11 @@ import type { SelectedProject } from '@/types';
 import { Card, CardContent } from '@/components/ui';
 import { PageContainer, PageHeader } from '@/components/layout';
 import { ProjectCard } from '@/components/common';
+import { getTranslations } from '@/lib/i18n/server';
 
 export default async function ProjectsPage() {
+  const tr = await getTranslations();
+
   const dbProjects = await db
     .selectFrom('projects')
     .selectAll()
@@ -29,8 +32,8 @@ export default async function ProjectsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Mina projekt"
-        description="En samling av mina bästa arbeten och open source-projekt"
+        title={tr.projects.title}
+        description={tr.projects.description}
       />
 
       {/* Projects Grid */}
@@ -38,7 +41,7 @@ export default async function ProjectsPage() {
         <Card className="max-w-md mx-auto">
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground">
-              Inga projekt att visa än
+              {tr.projects.noProjects}
             </p>
           </CardContent>
         </Card>

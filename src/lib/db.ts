@@ -17,6 +17,7 @@ export interface PostTable {
   slug: string;
   title: string;
   excerpt: string;
+  content: string | null;
   date: string;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;

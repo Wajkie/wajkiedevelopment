@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 import { Button } from '@/components/ui';
+import { useTranslations } from '@/lib/i18n';
 
 interface ProjectCardProps {
   project: {
@@ -22,6 +23,7 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const tr = useTranslations();
 
   return (
     <Card className="group hover:border-primary/50 transition-all flex flex-col h-full">
@@ -31,11 +33,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             {project.name}
           </CardTitle>
           {project.hasWorkflows && (
-            <span 
+            <span
               className="text-xs px-2 py-1 rounded-md bg-primary/15 text-primary border border-primary/30 shrink-0"
-              aria-label="CI/CD aktiverad"
+              aria-label={tr.projects.cicdEnabled}
             >
-              CI/CD
+              {tr.projects.cicd}
             </span>
           )}
         </div>
@@ -50,7 +52,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               onClick={() => setShowFullDescription(!showFullDescription)}
               className="text-xs text-primary hover:text-accent transition-colors underline"
             >
-              {showFullDescription ? 'Dölj beskrivning' : 'Se beskrivning'}
+              {showFullDescription ? tr.projects.hideDescription : tr.projects.showDescription}
             </button>
           </div>
         )}
@@ -70,8 +72,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
           )}
           {project.topics.slice(0, 2).map(topic => (
-            <span 
-              key={topic} 
+            <span
+              key={topic}
               className="text-xs px-2 py-1 rounded-md bg-secondary text-secondary-foreground"
             >
               {topic}
@@ -81,7 +83,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
         {/* Last Updated */}
         <p className="text-xs text-muted-foreground">
-          Senast uppdaterad:{' '}
+          {tr.projects.lastUpdated}{' '}
           <time dateTime={project.lastCommit}>
             {new Date(project.lastCommit).toLocaleDateString('sv-SE', {
               year: 'numeric',
@@ -94,34 +96,34 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
       <CardFooter className="flex flex-col gap-2 pt-4">
         <div className="flex gap-2 w-full">
-          <Button 
-            asChild 
-            variant="outline" 
-            size="sm" 
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
             className="flex-1"
           >
             <a
               href={project.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Visa ${project.name} på GitHub`}
+              aria-label={`${tr.projects.viewOnGithubAriaPrefix}${project.name}${tr.projects.viewOnGithubAriaSuffix}`}
             >
-              GitHub →
+              {tr.projects.viewOnGithub}
             </a>
           </Button>
           {(project.deploymentUrl || project.homepage) && (
-            <Button 
-              asChild 
-              size="sm" 
+            <Button
+              asChild
+              size="sm"
               className="flex-1"
             >
               <a
                 href={project.deploymentUrl || project.homepage || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Besök live demo av ${project.name}`}
+                aria-label={`${tr.projects.liveDemoAriaPrefix}${project.name}`}
               >
-                Live Demo →
+                {tr.projects.liveDemo}
               </a>
             </Button>
           )}

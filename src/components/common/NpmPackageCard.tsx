@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { NpmPackageObject } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { NpmPackageModal } from './NpmPackageModal';
+import { useTranslations, t } from '@/lib/i18n';
 
 interface NpmPackageCardProps {
   package: NpmPackageObject;
@@ -12,10 +13,11 @@ interface NpmPackageCardProps {
 export const NpmPackageCard = ({ package: pkg }: NpmPackageCardProps) => {
   const [showModal, setShowModal] = useState(false);
   const { package: info, downloads, score } = pkg;
+  const tr = useTranslations();
 
   return (
     <>
-      <Card 
+      <Card
         className="hover:shadow-lg transition-shadow cursor-pointer p-6"
         onClick={() => setShowModal(true)}
       >
@@ -32,7 +34,7 @@ export const NpmPackageCard = ({ package: pkg }: NpmPackageCardProps) => {
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5">
               <span className="text-gray-600 dark:text-gray-400">⬇️</span>
-              <span className="font-medium">{downloads.weekly}/week</span>
+              <span className="font-medium">{downloads.weekly}{tr.packages.perWeek}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-gray-600 dark:text-gray-400">⭐</span>
@@ -56,7 +58,7 @@ export const NpmPackageCard = ({ package: pkg }: NpmPackageCardProps) => {
               ))}
               {info.keywords.length > 3 && (
                 <span className="px-2 py-0.5 text-gray-500 text-xs">
-                  +{info.keywords.length - 3} more
+                  {t(tr.packages.moreKeywords, { count: info.keywords.length - 3 })}
                 </span>
               )}
             </div>
@@ -65,9 +67,9 @@ export const NpmPackageCard = ({ package: pkg }: NpmPackageCardProps) => {
       </Card>
 
       {showModal && (
-        <NpmPackageModal 
-          package={pkg} 
-          onClose={() => setShowModal(false)} 
+        <NpmPackageModal
+          package={pkg}
+          onClose={() => setShowModal(false)}
         />
       )}
     </>

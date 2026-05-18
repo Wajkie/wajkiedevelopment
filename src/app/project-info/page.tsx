@@ -2,38 +2,41 @@ import { projectInfo } from '@/constants/project-info';
 import { PageContainer, PageHeader } from '@/components/layout';
 import { TechStackSection } from '@/components/common';
 import type { Metadata } from 'next';
+import { getTranslations } from '@/lib/i18n/server';
 
 export const metadata: Metadata = {
   title: 'Project Info | Portfolio',
   description: 'Teknisk information om hur denna portfolio är byggd',
 };
 
-export default function ProjectInfoPage() {
+export default async function ProjectInfoPage() {
+  const tr = await getTranslations();
+
   return (
     <PageContainer maxWidth="6xl">
       <PageHeader
-        title="Om Projektet"
-        description="Teknisk dokumentation och arkitektur"
+        title={tr.projectInfo.title}
+        description={tr.projectInfo.description}
       />
 
       {/* Hero Section */}
       <div className="mb-12 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-border rounded-lg">
         <h2 className="text-2xl font-bold mb-3">{projectInfo.name}</h2>
         <p className="text-muted-foreground mb-4">{projectInfo.description}</p>
-        <a 
+        <a
           href={projectInfo.repository}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-blue-600 hover:underline"
         >
           <span>📦</span>
-          <span>View on GitHub</span>
+          <span>{tr.projectInfo.viewOnGithub}</span>
         </a>
       </div>
 
       {/* Features */}
       <section className="mb-12">
-        <h2 className="text-3xl font-bold mb-6">Features</h2>
+        <h2 className="text-3xl font-bold mb-6">{tr.projectInfo.features}</h2>
         <div className="grid gap-6 md:grid-cols-2">
           {projectInfo.features.map((feature) => (
             <div key={feature.category} className="border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
@@ -56,29 +59,29 @@ export default function ProjectInfoPage() {
 
       {/* Tech Stack */}
       <section className="mb-12">
-        <h2 className="text-3xl font-bold mb-6">Tech Stack</h2>
+        <h2 className="text-3xl font-bold mb-6">{tr.projectInfo.techStack}</h2>
         <div className="grid gap-6 md:grid-cols-2">
-          <TechStackSection 
+          <TechStackSection
             icon="⚛️"
-            title="Frontend"
+            title={tr.projectInfo.frontend}
             items={projectInfo.techStack.frontend}
             bulletColor="text-blue-600"
           />
-          <TechStackSection 
+          <TechStackSection
             icon="🔧"
-            title="Backend"
+            title={tr.projectInfo.backend}
             items={projectInfo.techStack.backend}
             bulletColor="text-green-600"
           />
-          <TechStackSection 
+          <TechStackSection
             icon="🔌"
-            title="Integrations"
+            title={tr.projectInfo.integrations}
             items={projectInfo.techStack.integrations}
             bulletColor="text-purple-600"
           />
-          <TechStackSection 
+          <TechStackSection
             icon="🛠️"
-            title="Dev Tools"
+            title={tr.projectInfo.devTools}
             items={projectInfo.techStack.devTools}
             bulletColor="text-orange-600"
           />
@@ -87,13 +90,13 @@ export default function ProjectInfoPage() {
 
       {/* Architecture */}
       <section className="mb-12">
-        <h2 className="text-3xl font-bold mb-6">Arkitektur</h2>
+        <h2 className="text-3xl font-bold mb-6">{tr.projectInfo.architecture}</h2>
         <p className="text-muted-foreground mb-6">{projectInfo.architecture.description}</p>
-        
+
         <div className="space-y-4">
           {projectInfo.architecture.layers.map((layer, index) => (
-            <div 
-              key={layer.name} 
+            <div
+              key={layer.name}
               className="border border-border rounded-lg p-6 hover:border-primary/50 transition-colors max-sm:!ml-0"
               style={{ marginLeft: `${index * 20}px` }}
             >
@@ -106,8 +109,8 @@ export default function ProjectInfoPage() {
               <p className="text-muted-foreground mb-3">{layer.description}</p>
               <div className="flex flex-wrap gap-2">
                 {layer.tech.map((tech) => (
-                  <span 
-                    key={tech} 
+                  <span
+                    key={tech}
                     className="text-xs px-2 py-1 bg-primary/10 text-primary rounded"
                   >
                     {tech}
@@ -121,18 +124,18 @@ export default function ProjectInfoPage() {
 
       {/* Footer CTA */}
       <div className="text-center p-8 bg-muted/50 rounded-lg">
-        <h3 className="text-xl font-semibold mb-2">Intresserad av koden?</h3>
+        <h3 className="text-xl font-semibold mb-2">{tr.projectInfo.interestedCta}</h3>
         <p className="text-muted-foreground mb-4">
-          Projektet är open source och alla kan utforska källkoden
+          {tr.projectInfo.interestedDescription}
         </p>
-        <a 
+        <a
           href={projectInfo.repository}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
         >
           <span>🚀</span>
-          <span>Utforska Repository</span>
+          <span>{tr.projectInfo.exploreRepo}</span>
         </a>
       </div>
     </PageContainer>

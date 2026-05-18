@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/layout";
 import A11yProvider from "@/components/providers/A11yProvider";
+import { LocaleProvider } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,29 +21,32 @@ export const metadata: Metadata = {
   description: "Full-stack developer med passion för clean code och modern design",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialLocale = await getLocale();
   return (
-    <html lang="sv">
+    <html lang={initialLocale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <A11yProvider>
-          {/* Skip to main content link */}
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
-          >
-            Hoppa till huvudinnehåll
-          </a>
-          <Navbar />
-          <main id="main-content">
-            {children}
-          </main>
-        </A11yProvider>
+        <LocaleProvider initialLocale={initialLocale}>
+          <A11yProvider>
+            {/* Skip to main content link */}
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
+            >
+              Hoppa till huvudinnehåll
+            </a>
+            <Navbar />
+            <main id="main-content">
+              {children}
+            </main>
+          </A11yProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

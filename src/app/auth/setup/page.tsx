@@ -6,8 +6,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui';
 import { Label } from '@/components/ui';
 import { setupAuth } from '@/lib/actions/auth';
+import { useTranslations } from '@/lib/i18n';
 
 export default function SetupPage() {
+  const tr = useTranslations();
   const [data, setData] = useState<{
     secret: string;
     qrCodeDataUrl: string;
@@ -27,7 +29,7 @@ export default function SetupPage() {
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Laddar...</p>
+            <p className="text-center text-muted-foreground">{tr.auth.setup.loading}</p>
           </CardContent>
         </Card>
       </div>
@@ -39,7 +41,7 @@ export default function SetupPage() {
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
-            <p className="text-center text-destructive">Fel vid laddning</p>
+            <p className="text-center text-destructive">{tr.auth.setup.loadingError}</p>
           </CardContent>
         </Card>
       </div>
@@ -53,27 +55,27 @@ export default function SetupPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <span aria-hidden="true">⚠️</span>
-              Setup redan klar
+              {tr.auth.setup.alreadySetup}
             </CardTitle>
             <CardDescription>
-              TOTP_SECRET finns redan i dina environment variables
+              {tr.auth.setup.alreadySetupDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Om du vill generera en ny secret, ta bort TOTP_SECRET från .env.local och ladda om denna sida.
+              {tr.auth.setup.alreadySetupHint}
             </p>
             {data.existingSecret && (
               <div className="p-4 rounded-lg bg-muted/50 border border-border">
                 <p className="text-xs text-muted-foreground font-mono break-all">
-                  Current secret: {data.existingSecret.substring(0, 10)}...
+                  {tr.auth.setup.currentSecret}{data.existingSecret.substring(0, 10)}...
                 </p>
               </div>
             )}
           </CardContent>
           <CardFooter>
             <Button asChild className="w-full">
-              <a href="/auth/signin">Gå till login</a>
+              <a href="/auth/signin">{tr.auth.setup.goToLogin}</a>
             </Button>
           </CardFooter>
         </Card>
@@ -87,19 +89,19 @@ export default function SetupPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <span aria-hidden="true">🔐</span>
-            TOTP Setup
+            {tr.auth.setup.title}
           </CardTitle>
           <CardDescription>
-            Scanna QR-koden med Google Authenticator, 1Password eller annan TOTP-app
+            {tr.auth.setup.description}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {/* QR Code */}
           <div className="bg-white p-4 rounded-lg">
-            <Image 
-              src={data.qrCodeDataUrl} 
-              alt="TOTP QR-kod för autentisering" 
+            <Image
+              src={data.qrCodeDataUrl}
+              alt={tr.auth.setup.qrAlt}
               width={300}
               height={300}
               className="w-full h-auto"
@@ -110,11 +112,11 @@ export default function SetupPage() {
           {/* Manual Entry */}
           <div className="space-y-2">
             <Label htmlFor="manual-secret">
-              Eller ange manuellt i appen:
+              {tr.auth.setup.manualEntry}
             </Label>
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <p className="text-xs text-muted-foreground mb-1">Secret:</p>
-              <code 
+              <p className="text-xs text-muted-foreground mb-1">{tr.auth.setup.secretLabel}</p>
+              <code
                 id="manual-secret"
                 className="text-sm text-accent font-mono break-all select-all block"
                 tabIndex={0}
@@ -125,27 +127,26 @@ export default function SetupPage() {
           </div>
 
           {/* Instructions */}
-          <div 
+          <div
             className="p-4 rounded-lg bg-accent/10 border border-accent/20"
             role="region"
-            aria-label="Installationsinstruktioner"
+            aria-label={tr.auth.setup.instructionsTitle}
           >
             <h3 className="text-sm font-semibold text-accent mb-2">
-              ⚠️ VIKTIGT:
+              {tr.auth.setup.important}
             </h3>
             <ol className="text-sm space-y-1 list-decimal list-inside">
-              <li>Scanna koden med din authenticator app</li>
-              <li>Kopiera secret nedan</li>
-              <li>Lägg till i <code className="bg-muted px-1 rounded">.env.local</code></li>
-              <li>Starta om dev server</li>
+              {tr.auth.setup.steps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
             </ol>
           </div>
 
           {/* Environment Variable */}
           <div className="space-y-2">
-            <Label htmlFor="env-totp">Lägg till i .env.local:</Label>
+            <Label htmlFor="env-totp">{tr.auth.setup.envLabel}</Label>
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <code 
+              <code
                 id="env-totp"
                 className="text-sm text-accent font-mono select-all block"
                 tabIndex={0}
@@ -157,9 +158,9 @@ export default function SetupPage() {
 
           {/* Generate Session Secret */}
           <div className="space-y-2">
-            <Label htmlFor="env-session">Generera också SESSION_SECRET:</Label>
+            <Label htmlFor="env-session">{tr.auth.setup.sessionSecretLabel}</Label>
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <code 
+              <code
                 id="env-session"
                 className="text-xs text-muted-foreground font-mono select-all block"
                 tabIndex={0}
@@ -169,24 +170,24 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div 
+          <div
             className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs text-center"
             role="alert"
           >
-            🔒 Ta bort denna route efter setup i production!
+            {tr.auth.setup.warning}
           </div>
         </CardContent>
 
         <CardFooter className="flex gap-3">
           <Button asChild className="flex-1">
-            <a href="/auth/signin">Gå till login</a>
+            <a href="/auth/signin">{tr.auth.setup.goToLogin}</a>
           </Button>
           <Button
             variant="secondary"
             onClick={() => window.location.reload()}
             className="flex-1"
           >
-            Generera ny
+            {tr.auth.setup.generateNew}
           </Button>
         </CardFooter>
       </Card>

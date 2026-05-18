@@ -7,8 +7,10 @@ import { Input } from '@/components/ui';
 import { Label } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { verifyAuthCode } from '@/lib/actions/auth';
+import { useTranslations } from '@/lib/i18n';
 
 export default function LoginPage() {
+  const tr = useTranslations();
   const router = useRouter();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -24,7 +26,7 @@ export default function LoginPage() {
       router.push('/admin');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Något gick fel');
+      setError(err instanceof Error ? err.message : tr.auth.signin.genericError);
       setCode('');
     } finally {
       setLoading(false);
@@ -38,18 +40,18 @@ export default function LoginPage() {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
               <span aria-hidden="true">🔐</span>
-              Admin Login
+              {tr.auth.signin.title}
             </CardTitle>
             <CardDescription>
-              Ange 6-siffrig kod från din authenticator app
+              {tr.auth.signin.totpHelp}
             </CardDescription>
           </CardHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="totp-code" className="sr-only">
-                  TOTP Kod
+                  {tr.auth.signin.totpLabel}
                 </Label>
                 <Input
                   id="totp-code"
@@ -60,10 +62,10 @@ export default function LoginPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                   className="text-center text-2xl font-mono tracking-widest"
-                  placeholder="000000"
+                  placeholder={tr.auth.signin.totpPlaceholder}
                   autoFocus
                   autoComplete="one-time-code"
-                  aria-label="Sexsiffrig TOTP-kod"
+                  aria-label={tr.auth.signin.totpAriaLabel}
                   aria-invalid={error ? 'true' : 'false'}
                   aria-describedby={error ? 'code-error' : undefined}
                   required
@@ -71,7 +73,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div 
+                <div
                   id="code-error"
                   role="alert"
                   className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm"
@@ -88,18 +90,18 @@ export default function LoginPage() {
                 className="w-full"
                 aria-busy={loading}
               >
-                {loading ? 'Verifierar...' : 'Logga in'}
+                {loading ? tr.auth.signin.signingIn : tr.auth.signin.signIn}
               </Button>
 
               <div className="w-full pt-4 border-t border-border space-y-2 text-center">
                 <p className="text-sm text-muted-foreground">
-                  Behöver du sätta upp authenticator?
+                  {tr.auth.signin.setupQuestion}
                 </p>
                 <a
                   href="/auth/setup"
                   className="text-sm text-accent hover:text-accent/80 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                 >
-                  Gå till setup →
+                  {tr.auth.signin.setupLink}
                 </a>
               </div>
             </CardFooter>

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui';
 import { logoutUser } from '@/lib/actions/auth';
 import { createPost } from '@/lib/actions/posts';
 import { useAnnouncer } from '@wajkie/react-a11y';
+import { useTranslations } from '@/lib/i18n';
 
 export default function AdminClient() {
   const router = useRouter();
@@ -25,8 +26,9 @@ export default function AdminClient() {
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
-  
+
   const announce = useAnnouncer();
+  const tr = useTranslations();
 
   useEffect(() => {
     if (message) {
@@ -39,7 +41,6 @@ export default function AdminClient() {
     await logoutUser();
   };
 
-  // Auto-generera slug från titel
   const handleTitleChange = (title: string) => {
     const slug = title
       .toLowerCase()
@@ -48,7 +49,7 @@ export default function AdminClient() {
       .replace(/ö/g, 'o')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-    
+
     setFormData({ ...formData, title, slug });
   };
 
@@ -59,12 +60,12 @@ export default function AdminClient() {
 
     try {
       const result = await createPost(formData);
-      setMessage('✅ Blogginlägg sparat!');
+      setMessage(tr.admin.blog.successMessage);
       setTimeout(() => {
         router.push(`/blog/${result.slug}`);
       }, 1500);
     } catch (error) {
-      setMessage(`❌ Fel: ${error instanceof Error ? error.message : 'Kunde inte spara inlägg'}`);
+      setMessage(`${tr.admin.blog.errorPrefix}${error instanceof Error ? error.message : 'Kunde inte spara inlägg'}`);
       console.error(error);
     } finally {
       setSaving(false);
@@ -80,10 +81,10 @@ export default function AdminClient() {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle as="h1" id="page-title" className="text-3xl">
-                  Nytt blogginlägg
+                  {tr.admin.blog.title}
                 </CardTitle>
                 <CardDescription>
-                  Skriv markdown, förhandsgranska och publicera direkt till GitHub
+                  {tr.admin.blog.description}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
@@ -93,7 +94,7 @@ export default function AdminClient() {
                   variant="outline"
                   size="sm"
                 >
-                  ← Dashboard
+                  {tr.admin.blog.backToDashboard}
                 </Button>
                 <Button
                   type="button"
@@ -101,7 +102,7 @@ export default function AdminClient() {
                   variant="outline"
                   size="sm"
                 >
-                  📖 Guide
+                  {tr.admin.blog.guide}
                 </Button>
                 <Button
                   type="button"
@@ -109,7 +110,7 @@ export default function AdminClient() {
                   variant="ghost"
                   size="sm"
                 >
-                  Logga ut
+                  {tr.admin.blog.logout}
                 </Button>
               </div>
             </div>
@@ -121,35 +122,35 @@ export default function AdminClient() {
           <form onSubmit={handleSubmit}>
             <CardContent className="pt-6 space-y-6">
               <h2 id="form-title" className="sr-only">
-                Formulär för nytt blogginlägg
+                {tr.admin.blog.formTitle}
               </h2>
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Titel</Label>
+                <Label htmlFor="title">{tr.admin.blog.titleLabel}</Label>
                 <Input
                   id="title"
                   type="text"
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Min fantastiska bloggpost"
+                  placeholder={tr.admin.blog.titlePlaceholder}
                   required
                   autoFocus
                   aria-describedby="title-help"
                 />
                 <p id="title-help" className="text-sm text-muted-foreground">
-                  Slug genereras automatiskt från titeln
+                  {tr.admin.blog.titleHelp}
                 </p>
               </div>
 
               {/* Slug */}
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug (URL)</Label>
+                <Label htmlFor="slug">{tr.admin.blog.slugLabel}</Label>
                 <Input
                   id="slug"
                   type="text"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="min-fantastiska-bloggpost"
+                  placeholder={tr.admin.blog.slugPlaceholder}
                   required
                   aria-describedby="slug-preview"
                 />
@@ -160,7 +161,7 @@ export default function AdminClient() {
 
               {/* Date */}
               <div className="space-y-2">
-                <Label htmlFor="date">Publiceringsdatum</Label>
+                <Label htmlFor="date">{tr.admin.blog.dateLabel}</Label>
                 <Input
                   id="date"
                   type="date"
@@ -172,25 +173,25 @@ export default function AdminClient() {
 
               {/* Excerpt */}
               <div className="space-y-2">
-                <Label htmlFor="excerpt">Excerpt (valfritt)</Label>
+                <Label htmlFor="excerpt">{tr.admin.blog.excerptLabel}</Label>
                 <Textarea
                   id="excerpt"
                   value={formData.excerpt}
                   onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  placeholder="En kort sammanfattning av inlägget..."
+                  placeholder={tr.admin.blog.excerptPlaceholder}
                   rows={3}
                   aria-describedby="excerpt-help"
                 />
                 <p id="excerpt-help" className="text-sm text-muted-foreground">
-                  Visas i blogglistningen
+                  {tr.admin.blog.excerptHelp}
                 </p>
               </div>
 
               {/* Content with Markdown Toolbar */}
               <div className="space-y-2">
-                <Label htmlFor="content">Innehåll (Markdown)</Label>
+                <Label htmlFor="content">{tr.admin.blog.contentLabel}</Label>
                 <div className="rounded-lg overflow-hidden border border-input">
-                  <MarkdownToolbar 
+                  <MarkdownToolbar
                     onInsert={(newContent) => setFormData({ ...formData, content: newContent })}
                     textareaRef={contentTextareaRef}
                   />
@@ -206,18 +207,18 @@ export default function AdminClient() {
                   />
                 </div>
                 <p id="content-help" className="text-sm text-muted-foreground">
-                  Använd toolbar eller skriv markdown direkt
+                  {tr.admin.blog.contentHelp}
                 </p>
               </div>
 
               {/* Message */}
               {message && (
-                <div 
+                <div
                   role="alert"
                   aria-live="polite"
                   className={`rounded-lg border p-4 ${
-                    message.includes('✅') 
-                      ? 'bg-accent/10 text-accent border-accent/20' 
+                    message.includes('✅')
+                      ? 'bg-accent/10 text-accent border-accent/20'
                       : 'bg-destructive/10 text-destructive border-destructive/20'
                   }`}
                 >
@@ -232,14 +233,14 @@ export default function AdminClient() {
                   disabled={saving}
                   aria-busy={saving}
                 >
-                  {saving ? 'Publicerar...' : 'Publicera blogginlägg'}
+                  {saving ? tr.admin.blog.publishing : tr.admin.blog.publish}
                 </Button>
                 <Button
                   type="button"
                   onClick={() => router.push('/blog')}
                   variant="outline"
                 >
-                  Avbryt
+                  {tr.admin.blog.cancel}
                 </Button>
               </div>
             </CardContent>

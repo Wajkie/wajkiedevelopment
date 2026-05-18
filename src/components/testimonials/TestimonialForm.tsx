@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui';
 import { submitTestimonial, sendThankYouEmailOnSubmit } from '@/lib/actions/testimonials';
 import { getFormFieldAriaAttributes, generateId } from '@wajkie/a11y-core';
 import { useAnnouncer } from '@wajkie/react-a11y';
+import { useTranslations, t } from '@/lib/i18n';
 
 export default function TestimonialForm() {
   const [formData, setFormData] = useState({
@@ -20,8 +21,9 @@ export default function TestimonialForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const announce = useAnnouncer();
+  const tr = useTranslations();
   const nameErrorId = generateId('name-error');
   const emailErrorId = generateId('email-error');
   const messageErrorId = generateId('message-error');
@@ -36,52 +38,57 @@ export default function TestimonialForm() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (formData.name.length < 2 || formData.name.length > 100) {
-      newErrors.name = 'Namnet måste vara mellan 2-100 tecken';
+      newErrors.name = tr.testimonials.form.nameValidation;
     }
-    
+
     if (!formData.email.includes('@')) {
-      newErrors.email = 'Ange en giltig e-postadress';
+      newErrors.email = tr.testimonials.form.emailValidation;
     }
-    
+
     if (formData.message.length < 10 || formData.message.length > 1000) {
-      newErrors.message = 'Meddelandet måste vara mellan 10-1000 tecken';
+      newErrors.message = tr.testimonials.form.messageValidation;
     }
-    
+
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length > 0) {
-      announce(`Formuläret innehåller ${Object.keys(newErrors).length} fel. Kontrollera fälten.`, 'assertive');
+      announce(
+        t(tr.testimonials.form.errorSummary, { count: Object.keys(newErrors).length }),
+        'assertive',
+      );
     }
-    
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
     setMessage('');
 
     try {
-      // Send thank you email if consent given (before hashing)
       if (formData.emailConsent) {
         await sendThankYouEmailOnSubmit(formData.email);
       }
 
-      // Submit testimonial (name and email will be hashed)
       await submitTestimonial(formData);
-      
-      setMessage('✅ Tack för ditt testimonial! Vi granskar det inom kort.');
+
+      setMessage(tr.testimonials.form.successMessage);
       setFormData({ name: '', email: '', message: '', emailConsent: false });
       setErrors({});
     } catch (error) {
-      setMessage(`❌ Något gick fel: ${error instanceof Error ? error.message : 'Okänt fel'}`);
+      setMessage(
+        t(tr.testimonials.form.errorMessage, {
+          error: error instanceof Error ? error.message : 'Okänt fel',
+        }),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -93,10 +100,10 @@ export default function TestimonialForm() {
         <Card>
           <CardHeader>
             <CardTitle as="h1" className="text-3xl">
-              Lämna ett testimonial
+              {tr.testimonials.form.title}
             </CardTitle>
             <CardDescription>
-              Har vi jobbat tillsammans? Dela gärna dina tankar och upplevelser!
+              {tr.testimonials.form.description}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -104,7 +111,10 @@ export default function TestimonialForm() {
               {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">
-                  Namn <span className="text-destructive" aria-label="obligatoriskt fält">*</span>
+                  {tr.testimonials.form.nameLabel}{' '}
+                  <span className="text-destructive" aria-label={tr.common.requiredLabel}>
+                    {tr.common.required}
+                  </span>
                 </Label>
                 <Input
                   id="name"
@@ -116,7 +126,7 @@ export default function TestimonialForm() {
                       setErrors({ ...errors, name: '' });
                     }
                   }}
-                  placeholder="Ditt namn"
+                  placeholder={tr.testimonials.form.namePlaceholder}
                   required
                   minLength={2}
                   maxLength={100}
@@ -132,7 +142,10 @@ export default function TestimonialForm() {
               {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  E-post <span className="text-destructive" aria-label="obligatoriskt fält">*</span>
+                  {tr.testimonials.form.emailLabel}{' '}
+                  <span className="text-destructive" aria-label={tr.common.requiredLabel}>
+                    {tr.common.required}
+                  </span>
                 </Label>
                 <Input
                   id="email"
@@ -144,13 +157,13 @@ export default function TestimonialForm() {
                       setErrors({ ...errors, email: '' });
                     }
                   }}
-                  placeholder="din.email@example.com"
+                  placeholder={tr.testimonials.form.emailPlaceholder}
                   required
                   {...getFormFieldAriaAttributes('email', !!errors.email, true)}
                   aria-describedby="email-help"
                 />
                 <p id="email-help" className="text-xs text-muted-foreground">
-                  Din e-post krypteras och används endast för att kontakta dig vid behov
+                  {tr.testimonials.form.emailHelp}
                 </p>
                 {errors.email && (
                   <p id={emailErrorId} className="text-sm text-destructive" role="alert">
@@ -162,7 +175,10 @@ export default function TestimonialForm() {
               {/* Message */}
               <div className="space-y-2">
                 <Label htmlFor="message">
-                  Ditt testimonial <span className="text-destructive" aria-label="obligatoriskt fält">*</span>
+                  {tr.testimonials.form.messageLabel}{' '}
+                  <span className="text-destructive" aria-label={tr.common.requiredLabel}>
+                    {tr.common.required}
+                  </span>
                 </Label>
                 <Textarea
                   id="message"
@@ -173,7 +189,7 @@ export default function TestimonialForm() {
                       setErrors({ ...errors, message: '' });
                     }
                   }}
-                  placeholder="Berätta om din upplevelse av att jobba med mig..."
+                  placeholder={tr.testimonials.form.messagePlaceholder}
                   required
                   minLength={10}
                   maxLength={1000}
@@ -182,7 +198,7 @@ export default function TestimonialForm() {
                   aria-describedby="message-help message-count"
                 />
                 <p id="message-count" className="text-xs text-muted-foreground" aria-live="polite">
-                  {formData.message.length}/1000 tecken
+                  {formData.message.length}{tr.testimonials.form.charCount}
                 </p>
                 {errors.message && (
                   <p id={messageErrorId} className="text-sm text-destructive" role="alert">
@@ -202,22 +218,21 @@ export default function TestimonialForm() {
                 />
                 <div className="flex-1">
                   <Label htmlFor="emailConsent" className="cursor-pointer text-sm">
-                    Skicka ett tackmeddelande via e-post
+                    {tr.testimonials.form.thankYouConsent}
                   </Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Om du kryssar i denna ruta kommer vi att skicka ett kort tackmeddelande till din e-post när ditt testimonial har granskats.
+                    {tr.testimonials.form.thankYouConsentDescription}
                   </p>
                 </div>
               </div>
 
               {/* GDPR Notice */}
               <div className="p-4 rounded-lg bg-accent/10 border border-accent/20 text-sm">
-                <h3 className="font-semibold text-accent mb-2">🔒 Integritet & GDPR</h3>
+                <h3 className="font-semibold text-accent mb-2">{tr.testimonials.form.privacyTitle}</h3>
                 <ul className="text-muted-foreground space-y-1 text-xs">
-                  <li>• Ditt namn och e-post krypteras</li>
-                  <li>• Vi sparar ingen personlig data i klartext</li>
-                  <li>• Ditt meddelande publiceras endast efter godkännande</li>
-                  <li>• Du kan när som helst kontakta oss för att ta bort ditt testimonial</li>
+                  {tr.testimonials.form.privacyPoints.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -238,12 +253,12 @@ export default function TestimonialForm() {
 
               {/* Actions */}
               <div className="flex gap-3 pt-4">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
                   aria-busy={isSubmitting}
                 >
-                  {isSubmitting ? 'Skickar...' : 'Skicka testimonial'}
+                  {isSubmitting ? tr.common.loading : tr.testimonials.form.submit}
                 </Button>
                 <Button
                   type="button"
@@ -254,9 +269,9 @@ export default function TestimonialForm() {
                     announce('Formuläret har rensats', 'polite');
                   }}
                   disabled={isSubmitting}
-                  aria-label="Rensa formuläret"
+                  aria-label={tr.testimonials.form.clearAriaLabel}
                 >
-                  Rensa
+                  {tr.testimonials.form.clear}
                 </Button>
               </div>
             </form>
@@ -266,17 +281,20 @@ export default function TestimonialForm() {
         {/* Info Card */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle as="h2">Vad händer sen?</CardTitle>
+            <CardTitle as="h2">{tr.testimonials.form.nextStepsTitle}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>
-              <span className="font-semibold text-foreground">1. Granskning:</span> Jag läser igenom alla testimonials personligen för att säkerställa autenticitet
+              <span className="font-semibold text-foreground">{tr.testimonials.form.step1Title}</span>{' '}
+              {tr.testimonials.form.step1}
             </p>
             <p>
-              <span className="font-semibold text-foreground">2. Godkännande:</span> När ditt testimonial är godkänt publiceras det på sidan
+              <span className="font-semibold text-foreground">{tr.testimonials.form.step2Title}</span>{' '}
+              {tr.testimonials.form.step2}
             </p>
             <p>
-              <span className="font-semibold text-foreground">3. Tack:</span> Om du valt att få ett tackmeddelande skickar vi ett kort tack via e-post
+              <span className="font-semibold text-foreground">{tr.testimonials.form.step3Title}</span>{' '}
+              {tr.testimonials.form.step3}
             </p>
           </CardContent>
         </Card>

@@ -3,24 +3,27 @@ import { db } from '@/lib/db';
 import { getUserRepos, getWorkflowRuns, getLatestCommit, getNpmPackageCount } from '@/lib/github';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui';
 import { ActivityFeed, StatsSidebar, PublicStatsWidget } from '@/components/common';
+import { getTranslations } from '@/lib/i18n/server';
+
+type Tr = Awaited<ReturnType<typeof getTranslations>>;
 
 export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 
 // Loading fallback components
-function ActivityFeedSkeleton() {
+function ActivityFeedSkeleton({ tr }: { tr: Tr }) {
   return (
     <Card as="section" aria-labelledby="activity-title" aria-busy="true">
       <CardHeader>
         <CardTitle id="activity-title" as="h2">
-          Senaste Aktivitet
+          {tr.activity.title}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          CI/CD status från mina projekt
+          {tr.activity.description}
         </p>
       </CardHeader>
       <div className="p-6 space-y-4">
-        <span className="sr-only" aria-live="polite">Laddar aktivitetsflöde...</span>
+        <span className="sr-only" aria-live="polite">{tr.activity.loading}</span>
         {[1, 2, 3].map((i) => (
           <div key={i} className="border border-border rounded-lg p-4 animate-pulse" aria-hidden="true">
             <div className="flex items-start justify-between mb-2">
@@ -41,14 +44,14 @@ function ActivityFeedSkeleton() {
   );
 }
 
-function StatsSidebarSkeleton() {
+function StatsSidebarSkeleton({ tr }: { tr: Tr }) {
   return (
     <Card aria-busy="true">
       <CardHeader>
-        <CardTitle as="h2">Översikt</CardTitle>
+        <CardTitle as="h2">{tr.home.overview}</CardTitle>
       </CardHeader>
       <div className="p-6 space-y-4 animate-pulse">
-        <span className="sr-only" aria-live="polite">Laddar statistik...</span>
+        <span className="sr-only" aria-live="polite">{tr.home.loadingStats}</span>
         <div className="h-4 bg-muted rounded w-3/4" aria-hidden="true"></div>
         <div className="h-4 bg-muted rounded w-2/3" aria-hidden="true"></div>
         <div className="h-4 bg-muted rounded w-1/2" aria-hidden="true"></div>
@@ -57,17 +60,17 @@ function StatsSidebarSkeleton() {
   );
 }
 
-function PublicStatsWidgetSkeleton() {
+function PublicStatsWidgetSkeleton({ tr }: { tr: Tr }) {
   return (
     <Card aria-busy="true">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle as="h2">Live Stats</CardTitle>
+          <CardTitle as="h2">{tr.publicStats.title}</CardTitle>
           <div className="h-5 w-12 bg-muted rounded-full" aria-hidden="true"></div>
         </div>
       </CardHeader>
       <div className="p-6 space-y-4 animate-pulse">
-        <span className="sr-only" aria-live="polite">Laddar live statistik...</span>
+        <span className="sr-only" aria-live="polite">{tr.home.loadingLive}</span>
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {[1, 2, 3].map((i) => (
             <div key={i} aria-hidden="true">
@@ -135,6 +138,8 @@ async function StatsSidebarData() {
 }
 
 export default async function Home() {
+  const tr = await getTranslations();
+
   return (
     <main className="min-h-screen py-12 px-4">
       {/* Hero Section */}
@@ -145,14 +150,14 @@ export default async function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
             </span>
-            LIVE
+            {tr.home.live}
           </div>
           <CardHeader>
             <CardTitle as="h1" className="text-3xl sm:text-4xl md:text-5xl mb-4">
-              Wajkie Development
+              {tr.home.title}
             </CardTitle>
             <CardDescription className="text-lg">
-              Real-time CI/CD pipelines, deployment status & live analytics
+              {tr.home.subtitle}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -160,16 +165,16 @@ export default async function Home() {
 
       {/* Grid Layout with Suspense boundaries */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Suspense fallback={<ActivityFeedSkeleton />}>
+        <Suspense fallback={<ActivityFeedSkeleton tr={tr} />}>
           <ActivityFeedData />
         </Suspense>
-        
+
         <div className="space-y-6">
-          <Suspense fallback={<PublicStatsWidgetSkeleton />}>
+          <Suspense fallback={<PublicStatsWidgetSkeleton tr={tr} />}>
             <PublicStatsWidget />
           </Suspense>
-          
-          <Suspense fallback={<StatsSidebarSkeleton />}>
+
+          <Suspense fallback={<StatsSidebarSkeleton tr={tr} />}>
             <StatsSidebarData />
           </Suspense>
         </div>

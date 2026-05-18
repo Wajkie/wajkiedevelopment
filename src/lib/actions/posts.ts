@@ -1,6 +1,7 @@
 'use server';
 
 import { getSession } from '@/lib/auth';
+import { db } from '@/lib/db';
 import { pushPostToGitHub } from '@/lib/github';
 import { redirect } from 'next/navigation';
 
@@ -12,55 +13,34 @@ export async function createPost(formData: {
   content: string;
 }) {
   const session = await getSession();
-  
+
   if (!session.isAuthenticated) {
     redirect('/auth/signin');
   }
 
-  const { slug, title, date, excerpt, content } = formData;
+  const { slug, title, content } = formData;
+  const date = formData.date || new Date().toISOString().split('T')[0];
+  const excerpt = formData.excerpt || '';
 
-  // Validera input
   if (!slug || !title || !content) {
     throw new Error('Slug, title och content är obligatoriska');
   }
 
-  // Pusha till GitHub
-  const result = await pushPostToGitHub(
-    slug,
-    title,
-    date || new Date().toISOString().split('T')[0],
-    excerpt || '',
-    content
-  );
+  // Save to DB (source of truth)
+  await db
+    .insertInto('posts')
+    .values({ slug, title, excerpt, content, date, updatedAt: new Date() })
+    .onConflict((oc) =>
+      oc.column('slug').doUpdateSet({ title, excerpt, content, date, updatedAt: new Date() })
+    )
+    .execute();
 
-  if (!result.success) {
-    throw new Error(result.error || 'Kunde inte pusha till GitHub');
-  }
-
-  // Anropa webhook för att spara metadata i databasen
+  // Push to GitHub as backup (non-fatal if it fails)
   try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
-    
-    await fetch(`${baseUrl}/api/webhook/post-published`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        slug,
-        title,
-        excerpt: excerpt || '',
-        date: date || new Date().toISOString().split('T')[0],
-      }),
-    });
-  } catch (webhookError) {
-    console.error('Webhook call failed:', webhookError);
-    // Fortsätt ändå - GitHub push lyckades
+    await pushPostToGitHub(slug, title, date, excerpt, content);
+  } catch (err) {
+    console.error('GitHub backup push misslyckades:', err);
   }
 
-  return { 
-    success: true, 
-    message: 'Blogginlägg pushat till GitHub och sparat i databas!',
-    slug 
-  };
+  return { success: true, slug };
 }

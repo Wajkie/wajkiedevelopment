@@ -1,24 +1,29 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import type { RepoWithActivity } from '@/types/github';
+import { useTranslations } from '@/lib/i18n';
 
 interface ActivityFeedProps {
   repos: RepoWithActivity[];
 }
 
 export default function ActivityFeed({ repos }: ActivityFeedProps) {
+  const tr = useTranslations();
+
   return (
     <Card as="section" aria-labelledby="activity-title" className="lg:col-span-2">
       <CardHeader>
         <CardTitle id="activity-title" as="h2">
-          Senaste Aktivitet
+          {tr.activity.title}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          CI/CD status från mina projekt
+          {tr.activity.description}
         </p>
       </CardHeader>
       <CardContent>
         {repos.length === 0 ? (
-          <p className="text-muted-foreground">Inga aktiva projekt med CI/CD</p>
+          <p className="text-muted-foreground">{tr.activity.noCicd}</p>
         ) : (
           <div className="space-y-4">
             {repos.map((repo) => (
@@ -37,7 +42,7 @@ export default function ActivityFeed({ repos }: ActivityFeedProps) {
                     )}
                   </div>
                   {repo.runs[0] && (
-                    <span 
+                    <span
                       className={`px-2 py-1 text-xs rounded-full shrink-0 ${
                         repo.runs[0].status === 'completed'
                           ? repo.runs[0].conclusion === 'success'
@@ -48,9 +53,9 @@ export default function ActivityFeed({ repos }: ActivityFeedProps) {
                     >
                       {repo.runs[0].status === 'completed'
                         ? repo.runs[0].conclusion === 'success'
-                          ? '✓ Success'
-                          : '✗ Failed'
-                        : '⚡ Running'}
+                          ? tr.activity.success
+                          : tr.activity.failed
+                        : tr.activity.running}
                     </span>
                   )}
                 </div>

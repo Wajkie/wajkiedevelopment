@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { Button } from '@/components/ui';
 import Link from 'next/link';
 import { getApprovedTestimonials } from '@/lib/actions/testimonials';
+import { useTranslations } from '@/lib/i18n';
 
 type Testimonial = {
   id: number;
@@ -15,6 +16,7 @@ type Testimonial = {
 export default function TestimonialsClient() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const tr = useTranslations();
 
   useEffect(() => {
     loadTestimonials();
@@ -37,10 +39,10 @@ export default function TestimonialsClient() {
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-              Testimonials
+              {tr.testimonials.title}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Se vad andra säger om att jobba med mig. Har vi samarbetat? Lämna gärna ditt eget testimonial!
+              {tr.testimonials.description}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -73,15 +75,15 @@ export default function TestimonialsClient() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-bold tracking-tight">
-            Testimonials
+            {tr.testimonials.title}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Se vad andra säger om att jobba med mig. Har vi samarbetat? Lämna gärna ditt eget testimonial!
+            {tr.testimonials.description}
           </p>
           <div className="pt-4">
             <Button asChild size="lg">
               <Link href="/testimonials/submit">
-                Lämna ett testimonial →
+                {tr.testimonials.leaveTestimonial}
               </Link>
             </Button>
           </div>
@@ -92,7 +94,7 @@ export default function TestimonialsClient() {
           <Card className="text-center py-12">
             <CardContent>
               <p className="text-muted-foreground text-lg">
-                Inga testimonials ännu. Bli den första att dela dina tankar!
+                {tr.testimonials.noTestimonials}
               </p>
             </CardContent>
           </Card>
@@ -108,11 +110,11 @@ export default function TestimonialsClient() {
                     <span className="text-4xl">💬</span>
                     <div className="flex-1">
                       <CardTitle className="text-sm text-muted-foreground">
-                        {testimonial.approvedAt && 
+                        {testimonial.approvedAt &&
                           new Date(testimonial.approvedAt).toLocaleDateString('sv-SE', {
                             year: 'numeric',
                             month: 'long',
-                            day: 'numeric'
+                            day: 'numeric',
                           })
                         }
                       </CardTitle>
@@ -125,7 +127,7 @@ export default function TestimonialsClient() {
                   </blockquote>
                   <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-sm text-muted-foreground italic">
-                      - Verifierad samarbetspartner
+                      {tr.testimonials.verifiedPartner}
                     </p>
                   </div>
                 </CardContent>
@@ -138,14 +140,14 @@ export default function TestimonialsClient() {
         <Card className="bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20">
           <CardContent className="text-center py-12 space-y-4">
             <h2 className="text-2xl font-bold">
-              Har vi jobbat tillsammans?
+              {tr.testimonials.cta}
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Ditt testimonial hjälper andra att förstå hur det är att samarbeta med mig. Det tar bara ett par minuter!
+              {tr.testimonials.ctaDescription}
             </p>
             <Button asChild size="lg">
               <Link href="/testimonials/submit">
-                Dela din upplevelse →
+                {tr.testimonials.ctaButton}
               </Link>
             </Button>
           </CardContent>

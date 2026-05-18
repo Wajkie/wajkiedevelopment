@@ -9,6 +9,7 @@
     "lint": "eslint",
     "migrate:up": "tsx src/lib/migrate.ts up",
     "migrate:down": "tsx src/lib/migrate.ts down",
+    "seed:posts": "node --use-system-ca --import tsx scripts/seed-posts.ts",
     "type-coverage": "type-coverage",
     "type-coverage:detail": "type-coverage --detail",
     "analyze": "npm run analyze:circular && npm run analyze:duplicates",

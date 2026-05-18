@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { PageContainer, PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
+import { getTranslations } from '@/lib/i18n/server';
 
 // Revalidera var 60:e sekund (ISR)
 export const revalidate = 60;
@@ -10,6 +11,8 @@ export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 
 export default async function BlogPage() {
+  const tr = await getTranslations();
+
   // Hämta posts från databasen (snabbt!)
   const posts = await db
     .selectFrom('posts')
@@ -19,13 +22,13 @@ export default async function BlogPage() {
 
   return (
     <PageContainer maxWidth="6xl">
-      <PageHeader 
-        title="Min blogg"
-        description="Tankar, lärdomar och tekniska djupdykningar"
+      <PageHeader
+        title={tr.blog.title}
+        description={tr.blog.description}
         action={
           <Button asChild>
             <Link href="/admin">
-              + Nytt inlägg
+              {tr.blog.newPost}
             </Link>
           </Button>
         }
@@ -34,10 +37,10 @@ export default async function BlogPage() {
         {posts.length === 0 ? (
           <Card className="max-w-md mx-auto">
             <CardContent className="text-center py-12">
-              <p className="text-xl text-muted-foreground mb-6">Inga blogginlägg än.</p>
+              <p className="text-xl text-muted-foreground mb-6">{tr.blog.noPosts}</p>
               <Button asChild>
                 <Link href="/admin">
-                  Skapa ditt första inlägg →
+                  {tr.blog.createFirst}
                 </Link>
               </Button>
             </CardContent>
@@ -66,7 +69,7 @@ export default async function BlogPage() {
                   </CardHeader>
                   <CardContent className="pt-0">
                     <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-primary/20 bg-primary/5 text-sm text-primary group-hover:bg-primary/10 group-hover:border-primary/40 transition-all">
-                      Läs mer
+                      {tr.blog.readMore}
                       <span className="group-hover:translate-x-1 transition-transform">→</span>
                     </span>
                   </CardContent>

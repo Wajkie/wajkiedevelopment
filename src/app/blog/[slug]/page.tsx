@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getPostFromGitHub } from '@/lib/github';
+import { db } from '@/lib/db';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -10,21 +10,26 @@ import 'highlight.js/styles/github-dark.css';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { ScrollToTopButton } from '@/components/layout';
+import { getTranslations } from '@/lib/i18n/server';
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Revalidera var 60:e sekund (ISR)
 export const revalidate = 60;
-// Force dynamic rendering (skippa pre-render under build)
 export const dynamic = 'force-dynamic';
 
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostFromGitHub(slug);
+  const tr = await getTranslations();
 
-  if (!post) {
+  const post = await db
+    .selectFrom('posts')
+    .selectAll()
+    .where('slug', '=', slug)
+    .executeTakeFirst();
+
+  if (!post || !post.content) {
     notFound();
   }
 
@@ -34,7 +39,7 @@ export default async function BlogPost({ params }: Props) {
         <CardHeader>
           <Button asChild variant="ghost" size="sm" className="mb-4 -ml-3">
             <Link href="/blog">
-              ← Tillbaka till bloggen
+              {tr.blog.backToList}
             </Link>
           </Button>
 
@@ -68,7 +73,7 @@ export default async function BlogPost({ params }: Props) {
           prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-2 prose-th:text-left
           prose-td:border prose-td:border-border prose-td:p-2
         ">
-          <ReactMarkdown 
+          <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[
               rehypeHighlight,
@@ -83,7 +88,7 @@ export default async function BlogPost({ params }: Props) {
         <CardFooter className="flex justify-between pt-8 border-t border-border">
           <Button asChild variant="outline" size="sm">
             <Link href="/blog">
-              ← Tillbaka till bloggen
+              {tr.blog.backToList}
             </Link>
           </Button>
           <ScrollToTopButton />

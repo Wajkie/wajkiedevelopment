@@ -4,6 +4,7 @@ import { PageContainer, PageHeader } from '@/components/layout';
 import { TimelineItem } from '@/components/common';
 import type { Metadata } from 'next';
 import type { JourneyEntry } from '@/types';
+import { getTranslations } from '@/lib/i18n/server';
 
 export const metadata: Metadata = {
   title: 'Min Utbildningsresa | Portfolio',
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 export const revalidate = 300; // 5 minutes
 
 export default async function JourneyPage() {
+  const tr = await getTranslations();
+
   const entries = await db
     .selectFrom('journeyEntries')
     .selectAll()
@@ -25,14 +28,14 @@ export default async function JourneyPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Min Utbildningsresa"
-        description="En visuell tidsresa genom min utbildning - projekt, lärdomar och tillväxt"
+        title={tr.journey.title}
+        description={tr.journey.description}
       />
 
       {journeyData.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-lg text-muted-foreground">
-            Innehållet kommer snart...
+            {tr.journey.comingSoon}
           </p>
         </div>
       ) : (
