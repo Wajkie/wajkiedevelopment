@@ -85,9 +85,11 @@ export async function POST(request: NextRequest) {
 
     // Check domain if provided
     const origin = request.headers.get('origin') || request.headers.get('referer');
-    if (origin && matchedToken.allowedDomains.length > 0) {
-      const allowed = matchedToken.allowedDomains.some(domain =>
-        origin.includes(domain)
+    const allowedDomains = Array.isArray(matchedToken.allowedDomains) ? matchedToken.allowedDomains : [];
+    if (origin && allowedDomains.length > 0) {
+      const normalizedOrigin = origin.replace(/https?:\/\//, '').replace(/\/$/, '');
+      const allowed = allowedDomains.some(domain =>
+        normalizedOrigin.includes(domain.replace(/https?:\/\//, '').replace(/\/$/, ''))
       );
       if (!allowed) {
         return NextResponse.json(
