@@ -68,6 +68,7 @@ export const projectInfo = {
         { name: 'Accessibility (WCAG AA)', description: '0 WAVE alerts, semantic HTML, ARIA labels, keyboard nav' },
         { name: 'Smooth Animations', description: '1s CSS transitions with prefers-reduced-motion support' },
         { name: 'Responsive Design', description: 'Mobile-first approach tested across all breakpoints' },
+        { name: 'Bilingual (SV / EN)', description: 'Full locale system with cookie + localStorage persistence, SSR-safe hydration, and compile-time key enforcement' },
       ],
     },
   ],
