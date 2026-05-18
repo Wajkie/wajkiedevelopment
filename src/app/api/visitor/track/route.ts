@@ -37,6 +37,16 @@ function checkRateLimit(tokenId: number, limit: number): boolean {
   return true;
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as {
@@ -48,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (!body.key || !body.action) {
       return NextResponse.json(
         { error: 'Missing required fields' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -69,7 +79,7 @@ export async function POST(request: NextRequest) {
     if (!matchedToken) {
       return NextResponse.json(
         { error: 'Invalid token' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -82,7 +92,7 @@ export async function POST(request: NextRequest) {
       if (!allowed) {
         return NextResponse.json(
           { error: 'Domain not allowed' },
-          { status: 403 }
+          { status: 403, headers: corsHeaders }
         );
       }
     }
@@ -91,7 +101,7 @@ export async function POST(request: NextRequest) {
     if (!checkRateLimit(matchedToken.id, matchedToken.rateLimit)) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
-        { status: 429 }
+        { status: 429, headers: corsHeaders }
       );
     }
 
@@ -119,12 +129,12 @@ export async function POST(request: NextRequest) {
       .where('id', '=', matchedToken.id)
       .execute();
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { headers: corsHeaders });
   } catch (error) {
     console.error('Visitor tracking error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

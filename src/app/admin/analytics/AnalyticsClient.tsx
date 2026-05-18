@@ -94,7 +94,7 @@ export function trackVisit(action = 'visit', path?: string) {
   if (typeof window === 'undefined') return;
   if (navigator.userAgent.includes('bot')) return;
   
-  fetch('${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourportfolio.com'}/api/visitor/track', {
+  fetch('${process.env.NEXT_PUBLIC_SITE_URL || 'https://wajkiedevelopment.se'}/api/visitor/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
