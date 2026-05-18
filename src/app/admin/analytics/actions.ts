@@ -30,7 +30,7 @@ export async function createToken(formData: {
     .values({
       name: formData.name,
       tokenHash,
-      allowedDomains: formData.allowedDomains,
+      allowedDomains: JSON.stringify(formData.allowedDomains) as unknown as string[],
       rateLimit: formData.rateLimit,
     })
     .returningAll()

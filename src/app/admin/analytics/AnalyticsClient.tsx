@@ -364,7 +364,7 @@ export function trackVisit(action = 'visit', path?: string) {
                 <h3 className="font-bold">{token.name}</h3>
                 <div className="text-sm text-muted-foreground space-y-1 mt-2">
                   <p>ID: {token.id}</p>
-                  <p>Domäner: {token.allowedDomains.length > 0 ? token.allowedDomains.join(', ') : 'Alla'}</p>
+                  <p>Domäner: {Array.isArray(token.allowedDomains) && token.allowedDomains.length > 0 ? token.allowedDomains.join(', ') : 'Alla'}</p>
                   <p>Rate Limit: {token.rateLimit}/min</p>
                   <p>Skapad: {new Date(token.createdAt).toLocaleDateString('sv-SE')}</p>
                   {token.lastUsedAt && (
