@@ -49,7 +49,8 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as {
+    const text = await request.text();
+    const body = JSON.parse(text) as {
       key: string;
       action: string;
       path?: string;

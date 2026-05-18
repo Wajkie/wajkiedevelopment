@@ -96,7 +96,6 @@ export function trackVisit(action = 'visit', path?: string) {
   
   fetch('${process.env.NEXT_PUBLIC_SITE_URL || 'https://wajkiedevelopment.se'}/api/visitor/track', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       key: '${token}',
       action,
