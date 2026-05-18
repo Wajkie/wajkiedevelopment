@@ -9,13 +9,15 @@ import { Label } from '@/components/ui';
 import { sendCV } from '@/lib/actions/email';
 import { getFormFieldAriaAttributes } from '@wajkie/a11y-core';
 import { useAnnouncer } from '@wajkie/react-a11y';
+import { useTranslations } from '@/lib/i18n';
 
 export default function CVRequestForm() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  
+  const tr = useTranslations();
+
   const announce = useAnnouncer();
 
   useEffect(() => {
@@ -32,11 +34,11 @@ export default function CVRequestForm() {
     try {
       await sendCV(email);
       setStatus('success');
-      setMessage('CV och personligt brev skickat! Kolla din inkorg.');
+      setMessage(tr.notFound.successMessage);
       setEmail('');
     } catch (error) {
       setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'Något gick fel. Försök igen.');
+      setMessage(error instanceof Error ? error.message : tr.notFound.errorMessage);
     } finally {
       setLoading(false);
     }
@@ -47,47 +49,45 @@ export default function CVRequestForm() {
       <CardHeader>
         <div className="text-5xl sm:text-6xl md:text-8xl mb-4">🤷‍♂️</div>
         <CardTitle as="h1" className="text-4xl sm:text-5xl md:text-6xl mb-4">
-          404
+          {tr.notFound.code}
         </CardTitle>
         <CardDescription className="text-xl">
-          Sidan du letar efter finns inte
+          {tr.notFound.title}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4 text-left">
-          <p className="text-muted-foreground">
-            <strong>Letar du efter mitt CV eller personliga brev?</strong>
+        <div className="space-y-3 text-left">
+          <p className="text-muted-foreground font-medium">
+            {tr.notFound.cvHeading}
           </p>
           <p className="text-muted-foreground">
-            Det finns inte här. Istället bjuder jag på något mycket bättre:
+            {tr.notFound.cvDescription}
           </p>
-          <ul className="space-y-2 text-muted-foreground pl-6">
-            <li>✨ <strong>Levande kod</strong> – Se mina projekt på GitHub</li>
-            <li>📦 <strong>Publicerade paket</strong> – Användbara npm-paket som andra utvecklare använder</li>
-            <li>🚀 <strong>CI/CD pipelines</strong> – Professionell utvecklingsprocess i praktiken</li>
-            <li>📝 <strong>Tekniska artiklar</strong> – Min blogg där jag delar kunskap och lärdomar</li>
-            <li>🎨 <strong>Modern design</strong> – Den här sajten är mitt CV</li>
+          <ul className="space-y-1 text-muted-foreground pl-4 text-sm">
+            {tr.notFound.features.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
           </ul>
-          <p className="text-muted-foreground italic">
-            Varför läsa om vad jag kan när du kan <strong>se</strong> vad jag bygger?
+          <p className="text-muted-foreground italic text-sm pt-1">
+            {tr.notFound.cta}
           </p>
         </div>
 
-        {/* CV Request Form */}
+        {/* CV Request */}
         <div className="border-t border-border pt-6">
-          <p className="text-sm text-muted-foreground mb-4">
-            Behöver du ändå ett traditionellt CV? Ange din e-post så skickar jag det direkt.
+          <p className="text-sm text-muted-foreground mb-3">
+            {tr.notFound.cvRequestDescription}
           </p>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1">
                 <Label htmlFor="email" className="sr-only">
-                  E-postadress
+                  {tr.notFound.emailLabel}
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="din@email.se"
+                  placeholder={tr.notFound.emailPlaceholder}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -96,12 +96,12 @@ export default function CVRequestForm() {
                   {...getFormFieldAriaAttributes('email', status === 'error', false)}
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading || !email}
                 aria-busy={loading}
               >
-                {loading ? 'Skickar...' : 'Skicka CV'}
+                {loading ? tr.notFound.sending : tr.notFound.sendCv}
               </Button>
             </div>
             {status === 'success' && (
@@ -117,15 +117,15 @@ export default function CVRequestForm() {
           </form>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <Button asChild>
-            <Link href="/">Tillbaka till startsidan</Link>
+            <Link href="/">{tr.notFound.backHome}</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/projects">Se mina projekt</Link>
+            <Link href="/projects">{tr.notFound.viewProjects}</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/blog">Läs min blogg</Link>
+            <Link href="/blog">{tr.notFound.readBlog}</Link>
           </Button>
         </div>
       </CardContent>

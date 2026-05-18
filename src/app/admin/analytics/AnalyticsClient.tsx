@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
@@ -43,12 +43,7 @@ export default function AnalyticsClient({ initialTokens }: { initialTokens: Toke
   const [domains, setDomains] = useState('');
   const [rateLimit, setRateLimit] = useState('100');
 
-  // Load stats on mount
-  useEffect(() => {
-    loadStats();
-  }, [selectedTokenId]);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     setLoadingStats(true);
     try {
       const data = await getVisitorStats(selectedTokenId);
@@ -58,7 +53,11 @@ export default function AnalyticsClient({ initialTokens }: { initialTokens: Toke
     } finally {
       setLoadingStats(false);
     }
-  };
+  }, [selectedTokenId]);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   const handleCreateToken = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +72,7 @@ export default function AnalyticsClient({ initialTokens }: { initialTokens: Toke
 
       setNewToken(data);
       setTokens([data, ...tokens]);
-      
+
       // Reset form
       setName('');
       setDomains('');
@@ -93,8 +92,8 @@ export default function AnalyticsClient({ initialTokens }: { initialTokens: Toke
 export function trackVisit(action = 'visit', path?: string) {
   if (typeof window === 'undefined') return;
   if (navigator.userAgent.includes('bot')) return;
-  
-  fetch('${process.env.NEXT_PUBLIC_SITE_URL || 'https://wajkiedevelopment.se'}/api/visitor/track', {
+
+  fetch('${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.wajkiedevelopment.se'}/api/visitor/track', {
     method: 'POST',
     body: JSON.stringify({
       key: '${token}',
@@ -113,6 +112,7 @@ export function trackVisit(action = 'visit', path?: string) {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-8">
+
         {/* Header */}
         <Card className="p-6">
           <div className="flex justify-between items-center">
@@ -128,18 +128,18 @@ export function trackVisit(action = 'visit', path?: string) {
           </div>
         </Card>
 
-        {/* Token Filter */}
+        {/* Token Filter + Refresh */}
         {tokens.length > 0 && (
           <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <Label htmlFor="token-filter" className="text-sm font-medium">
-                Filtrera per token:
-              </Label>
+            <Label htmlFor="token-filter" className="text-sm font-medium">
+              Filtrera per token:
+            </Label>
+            <div className="flex gap-2 mt-2">
               <select
                 id="token-filter"
                 value={selectedTokenId || ''}
                 onChange={(e) => setSelectedTokenId(e.target.value ? Number(e.target.value) : undefined)}
-                className="px-3 py-2 bg-background border border-input rounded-md"
+                className="flex-1 px-3 py-2 bg-background border border-input rounded-md"
               >
                 <option value="">Alla tokens</option>
                 {tokens.map((token) => (
@@ -148,233 +148,204 @@ export function trackVisit(action = 'visit', path?: string) {
                   </option>
                 ))}
               </select>
+              <Button type="button" onClick={loadStats} disabled={loadingStats}>
+                {loadingStats ? 'Loading...' : '🔄 Refresh'}
+              </Button>
             </div>
           </Card>
         )}
 
-      {/* Stats Overview */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground mb-2">Total Visits</div>
-            <div className="text-3xl font-bold">{stats.totalVisits.toLocaleString()}</div>
-          </Card>
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground mb-2">Unique Visitors</div>
-            <div className="text-3xl font-bold">{stats.uniqueVisitors.toLocaleString()}</div>
-          </Card>
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground mb-2">Last 24h</div>
-            <div className="text-3xl font-bold">{stats.recentVisits.toLocaleString()}</div>
-          </Card>
-          <Card className="p-6">
-            <div className="text-sm text-muted-foreground mb-2">Actions</div>
-            <div className="text-3xl font-bold">{stats.actions.length}</div>
-          </Card>
-        </div>
-      )}
+        {/* Stats Overview */}
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground mb-2">Total Visits</div>
+              <div className="text-3xl font-bold">{stats.totalVisits.toLocaleString()}</div>
+            </Card>
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground mb-2">Unique Visitors</div>
+              <div className="text-3xl font-bold">{stats.uniqueVisitors.toLocaleString()}</div>
+            </Card>
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground mb-2">Last 24h</div>
+              <div className="text-3xl font-bold">{stats.recentVisits.toLocaleString()}</div>
+            </Card>
+            <Card className="p-6">
+              <div className="text-sm text-muted-foreground mb-2">Actions</div>
+              <div className="text-3xl font-bold">{stats.actions.length}</div>
+            </Card>
+          </div>
+        )}
 
-      {/* Top Pages & Actions */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Top Pages */}
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">🔥 Top Pages</h3>
-            <div className="space-y-3">
-              {stats.topPages.map((page, idx) => (
-                <div key={page.path} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-muted-foreground w-6">
-                      #{idx + 1}
-                    </span>
-                    <span className="text-sm font-mono">{page.path}</span>
-                  </div>
-                  <span className="text-sm font-semibold">{page.visits}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Actions Breakdown */}
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">⚡ Actions</h3>
-            <div className="space-y-3">
-              {stats.actions.map((action) => (
-                <div key={action.action} className="flex items-center justify-between">
-                  <span className="text-sm capitalize">{action.action}</span>
-                  <div className="flex items-center gap-3">
-                    <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-primary h-2 rounded-full"
-                        style={{
-                          width: `${(action.count / stats.totalVisits) * 100}%`,
-                        }}
-                      />
+        {/* Top Pages & Actions */}
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4">🔥 Top Pages</h3>
+              <div className="space-y-3">
+                {stats.topPages.map((page, idx) => (
+                  <div key={page.path} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-bold text-muted-foreground w-6">
+                        #{idx + 1}
+                      </span>
+                      <span className="text-sm font-mono">{page.path}</span>
                     </div>
-                    <span className="text-sm font-semibold w-12 text-right">{action.count}</span>
+                    <span className="text-sm font-semibold">{page.visits}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4">⚡ Actions</h3>
+              <div className="space-y-3">
+                {stats.actions.map((action) => (
+                  <div key={action.action} className="flex items-center justify-between">
+                    <span className="text-sm capitalize">{action.action}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full"
+                          style={{ width: `${(action.count / stats.totalVisits) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-semibold w-12 text-right">{action.count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Create Token Form */}
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Skapa ny tracking token</h2>
+          <form onSubmit={handleCreateToken} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Projektnamn *</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="My Side Project"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="domains">Tillåtna domäner (kommaseparerade)</Label>
+              <Input
+                id="domains"
+                value={domains}
+                onChange={(e) => setDomains(e.target.value)}
+                placeholder="myproject.vercel.app, custom-domain.com"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                Lämna tom för att tillåta alla domäner
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="rateLimit">Rate Limit (requests/min)</Label>
+              <Input
+                id="rateLimit"
+                type="number"
+                value={rateLimit}
+                onChange={(e) => setRateLimit(e.target.value)}
+                placeholder="100"
+              />
+            </div>
+
+            <Button type="submit" disabled={isCreating}>
+              {isCreating ? 'Skapar...' : '🔑 Skapa Token'}
+            </Button>
+          </form>
+        </Card>
+
+        {/* New Token Display (shown once) */}
+        {newToken && (
+          <Card className="p-6 border-green-500 bg-green-50 dark:bg-green-950">
+            <h2 className="text-2xl font-bold mb-4 text-green-700 dark:text-green-300">
+              ✅ Token skapad för &ldquo;{newToken.name}&rdquo;
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <Label>Token (visas bara denna gång!)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newToken.token}
+                    readOnly
+                    className="font-mono text-sm"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(newToken.token);
+                      alert('Token kopierad!');
+                    }}
+                    variant="outline"
+                  >
+                    📋 Kopiera
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <Label>Copy-Paste Ready Code</Label>
+                <div className="relative">
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-xs">
+                    <code>{getCodeSnippet(newToken.token)}</code>
+                  </pre>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(getCodeSnippet(newToken.token));
+                      alert('Code kopierad!');
+                    }}
+                    className="absolute top-2 right-2"
+                    variant="outline"
+                    size="sm"
+                  >
+                    📋 Kopiera kod
+                  </Button>
+                </div>
+              </div>
+
+              <Button type="button" onClick={() => setNewToken(null)} variant="outline">
+                Stäng
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* Existing Tokens */}
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Befintliga tokens</h2>
+          {tokens.length === 0 ? (
+            <p className="text-muted-foreground">Inga tokens skapade ännu</p>
+          ) : (
+            <div className="space-y-4">
+              {tokens.map((token) => (
+                <div key={token.id} className="border border-border rounded p-4">
+                  <h3 className="font-bold">{token.name}</h3>
+                  <div className="text-sm text-muted-foreground space-y-1 mt-2">
+                    <p>ID: {token.id}</p>
+                    <p>Domäner: {Array.isArray(token.allowedDomains) && token.allowedDomains.length > 0 ? token.allowedDomains.join(', ') : 'Alla'}</p>
+                    <p>Rate Limit: {token.rateLimit}/min</p>
+                    <p>Skapad: {new Date(token.createdAt).toLocaleDateString('sv-SE')}</p>
+                    {token.lastUsedAt && (
+                      <p>Senast använd: {new Date(token.lastUsedAt).toLocaleString('sv-SE')}</p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-          </Card>
-        </div>
-      )}
-
-      {/* Filter */}
-      {tokens.length > 0 && (
-        <Card className="p-6">
-          <Label htmlFor="tokenFilter">Filter by Project</Label>
-          <div className="flex gap-2 mt-2">
-            <select
-              id="tokenFilter"
-              className="flex-1 px-3 py-2 border border-border rounded-md bg-background"
-              value={selectedTokenId || ''}
-              onChange={(e) => setSelectedTokenId(e.target.value ? Number(e.target.value) : undefined)}
-            >
-              <option value="">All Projects</option>
-              {tokens.map((token) => (
-                <option key={token.id} value={token.id}>
-                  {token.name}
-                </option>
-              ))}
-            </select>
-            <Button type="button" onClick={loadStats} disabled={loadingStats}>
-              {loadingStats ? 'Loading...' : '🔄 Refresh'}
-            </Button>
-          </div>
+          )}
         </Card>
-      )}
 
-      {/* Create Token Form */}
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Skapa ny tracking token</h2>
-        <form onSubmit={handleCreateToken} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Projektnamn *</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="My Side Project"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="domains">Tillåtna domäner (kommaseparerade)</Label>
-            <Input
-              id="domains"
-              value={domains}
-              onChange={(e) => setDomains(e.target.value)}
-              placeholder="myproject.vercel.app, custom-domain.com"
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Lämna tom för att tillåta alla domäner
-            </p>
-          </div>
-
-          <div>
-            <Label htmlFor="rateLimit">Rate Limit (requests/min)</Label>
-            <Input
-              id="rateLimit"
-              type="number"
-              value={rateLimit}
-              onChange={(e) => setRateLimit(e.target.value)}
-              placeholder="100"
-            />
-          </div>
-
-          <Button type="submit" disabled={isCreating}>
-            {isCreating ? 'Skapar...' : '🔑 Skapa Token'}
-          </Button>
-        </form>
-      </Card>
-
-      {/* New Token Display (shown once) */}
-      {newToken && (
-        <Card className="p-6 border-green-500 bg-green-50 dark:bg-green-950">
-          <h2 className="text-2xl font-bold mb-4 text-green-700 dark:text-green-300">
-            ✅ Token skapad för `&ldquo;`{newToken.name}`&ldquo;`
-          </h2>
-          
-          <div className="space-y-4">
-            <div>
-              <Label>Token (visas bara denna gång!)</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={newToken.token}
-                  readOnly
-                  className="font-mono text-sm"
-                />
-                <Button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(newToken.token);
-                    alert('Token kopierad!');
-                  }}
-                  variant="outline"
-                >
-                  📋 Kopiera
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <Label>Copy-Paste Ready Code</Label>
-              <div className="relative">
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-xs">
-                  <code>{getCodeSnippet(newToken.token)}</code>
-                </pre>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(getCodeSnippet(newToken.token));
-                    alert('Code kopierad!');
-                  }}
-                  className="absolute top-2 right-2"
-                  variant="outline"
-                  size="sm"
-                >
-                  📋 Kopiera kod
-                </Button>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              onClick={() => setNewToken(null)}
-              variant="outline"
-            >
-              Stäng
-            </Button>
-          </div>
-        </Card>
-      )}
-
-      {/* Existing Tokens */}
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Befintliga tokens</h2>
-        {tokens.length === 0 ? (
-          <p className="text-muted-foreground">Inga tokens skapade ännu</p>
-        ) : (
-          <div className="space-y-4">
-            {tokens.map((token) => (
-              <div key={token.id} className="border border-border rounded p-4">
-                <h3 className="font-bold">{token.name}</h3>
-                <div className="text-sm text-muted-foreground space-y-1 mt-2">
-                  <p>ID: {token.id}</p>
-                  <p>Domäner: {Array.isArray(token.allowedDomains) && token.allowedDomains.length > 0 ? token.allowedDomains.join(', ') : 'Alla'}</p>
-                  <p>Rate Limit: {token.rateLimit}/min</p>
-                  <p>Skapad: {new Date(token.createdAt).toLocaleDateString('sv-SE')}</p>
-                  {token.lastUsedAt && (
-                    <p>Senast använd: {new Date(token.lastUsedAt).toLocaleString('sv-SE')}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
       </div>
     </div>
   );

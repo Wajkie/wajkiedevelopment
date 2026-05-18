@@ -1,7 +1,7 @@
 export const projectInfo = {
   name: 'Portfolio & Blog Platform',
   description: 'A modern full-stack web application built with Next.js, TypeScript, and PostgreSQL. The platform combines a personal portfolio with blog functionality, project management, analytics, and dynamic content.',
-  repository: 'https://github.com/wajkie/portfolio',
+  repository: 'https://github.com/Wajkie/wajkiedevelopment',
   
   features: [
     {
