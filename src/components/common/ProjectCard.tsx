@@ -71,7 +71,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               ⭐ {project.stars}
             </span>
           )}
-          {project.topics.slice(0, 2).map(topic => (
+          {(Array.isArray(project.topics) ? project.topics : []).slice(0, 2).map(topic => (
             <span
               key={topic}
               className="text-xs px-2 py-1 rounded-md bg-secondary text-secondary-foreground"

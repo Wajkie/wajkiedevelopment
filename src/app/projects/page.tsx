@@ -22,7 +22,7 @@ export default async function ProjectsPage() {
     homepage: p.homepage,
     language: p.language,
     stars: p.stars,
-    topics: p.topics,
+    topics: Array.isArray(p.topics) ? p.topics : [],
     hasWorkflows: p.hasWorkflows,
     lastCommit: p.lastCommit.toISOString(),
     deploymentUrl: p.deploymentUrl,
