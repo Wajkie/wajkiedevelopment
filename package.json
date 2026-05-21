@@ -21,6 +21,9 @@
     "a11y:ci": "start-server-and-test dev http://localhost:3000 a11y",
     "prepare": "husky"
   },
+  "typeCoverage": {
+    "ignoreFiles": [".next/**"]
+  },
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"

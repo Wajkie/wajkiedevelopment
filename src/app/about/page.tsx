@@ -16,7 +16,7 @@ export const revalidate = 300;
 export default async function AboutPage() {
   const tr = await getTranslations();
 
-  let bioData;
+  let bioData: Awaited<ReturnType<typeof getBio>> | undefined;
   try {
     bioData = await getBio();
   } catch {
